@@ -1,0 +1,7 @@
+{
+	"name": "Sensor",
+	"connector": "rest",
+	"baseURL": "",
+	"crud": true,
+	"debug": true
+}

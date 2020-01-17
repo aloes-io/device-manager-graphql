@@ -1,0 +1,7 @@
+{
+  "name": "Device",
+  "connector": "rest",
+  "baseURL": "",
+  "crud": true,
+  "debug": true
+}
