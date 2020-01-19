@@ -1,16 +1,19 @@
-import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
+import {
+  inject,
+  lifeCycleObserver,
+  LifeCycleObserver,
+  ValueOrPromise,
+} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-// import config from './user.datasource.config.json';
-import config, {baseURL, endPoint} from './user.datasource.config';
+import config from './cache.datasource.config.json';
 
 @lifeCycleObserver('datasource')
-export class UserDataSource extends juggler.DataSource implements LifeCycleObserver {
-  static dataSourceName = 'User';
-  static endPoint = endPoint;
-  static baseURL = baseURL;
+export class CacheDataSource extends juggler.DataSource
+  implements LifeCycleObserver {
+  static dataSourceName = 'cache';
 
   constructor(
-    @inject('datasources.config.User', {optional: true})
+    @inject('datasources.config.cache', {optional: true})
     dsConfig: object = config,
   ) {
     super(dsConfig);

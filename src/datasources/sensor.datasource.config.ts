@@ -8,8 +8,8 @@ const result = dotenv.config();
 const host = result.parsed ? result.parsed.ALOES_SERVER_HOST : 'localhost:8000';
 const scheme = result.parsed ? result.parsed.ALOES_SERVER_SCHEME : 'http';
 const basePath = result.parsed ? result.parsed.ALOES_SERVER_API_ROOT : '/api';
-const baseURL = `${scheme}://${host}${basePath}`;
-const resource = 'Sensors';
+export const baseURL = `${scheme}://${host}${basePath}`;
+export const endPoint = 'Sensors';
 
 const sensorDefinition = {
   name: 'Sensor',
@@ -27,24 +27,22 @@ const sensorDefinition = {
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}`,
+        url: `${baseURL}/${endPoint}`,
         headers: {
           authorization: '{token}',
         },
         query: {
-          limit: '{limit}',
-          offset: '{offset}',
           filter: '{filter}',
         },
       },
       functions: {
-        find: ['token', 'limit', 'offset', 'filter'],
+        find: ['token', 'filter'],
       },
     },
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}/count`,
+        url: `${baseURL}/${endPoint}/count`,
         headers: {
           authorization: '{token}',
         },
@@ -59,7 +57,7 @@ const sensorDefinition = {
     {
       template: {
         method: 'POST',
-        url: `${baseURL}/${resource}`,
+        url: `${baseURL}/${endPoint}`,
         headers: {
           authorization: '{token}',
         },
@@ -72,7 +70,7 @@ const sensorDefinition = {
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}/{sensorId}`,
+        url: `${baseURL}/${endPoint}/{sensorId}`,
         headers: {
           authorization: '{token}',
         },
@@ -83,8 +81,23 @@ const sensorDefinition = {
     },
     {
       template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{sensorId}/measurements`,
+        headers: {
+          authorization: '{token}',
+        },
+        query: {
+          filter: '{filter}',
+        },
+      },
+      functions: {
+        findMeasurements: ['token', 'sensorId', 'filter'],
+      },
+    },
+    {
+      template: {
         method: 'PUT',
-        url: `${baseURL}/${resource}/{sensorId}`,
+        url: `${baseURL}/${endPoint}/{sensorId}`,
         headers: {
           authorization: '{token}',
         },

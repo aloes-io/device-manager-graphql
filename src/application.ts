@@ -4,8 +4,10 @@ import {RestExplorerBindings, RestExplorerComponent} from '@loopback/rest-explor
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
+import {CacheBindings, CacheComponent} from 'loopback-api-cache';
 import path from 'path';
 import merge from 'lodash.merge';
+import {CacheStrategyProvider} from './providers';
 import {MySequence} from './sequence';
 
 export class DeviceManagerApplication extends BootMixin(
@@ -14,10 +16,11 @@ export class DeviceManagerApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-    // Set up the custom sequence
+    this.component(CacheComponent);
+    this.bind(CacheBindings.CACHE_STRATEGY).toProvider(CacheStrategyProvider);
+
     this.sequence(MySequence);
 
-    // Set up default home page
     this.static('/', path.join(__dirname, '../public'));
 
     // Setup security schemes available for endpoints
@@ -25,20 +28,16 @@ export class DeviceManagerApplication extends BootMixin(
     merge(spec, {
       components: {
         securitySchemes: {
-          // BasicAuth: {
-          //   type: 'http',
-          //   scheme: 'basic',
-          // },
           // BearerAuth: {
           //   type: 'http',
           //   scheme: 'bearer',
           // },
-          // apiKeyAuth: {
-          //   type: 'apiKey',
-          //   description: 'Device / Application API key',
-          //   in: 'header',
-          //   name: 'apikey',
-          // },
+          ApiKey: {
+            type: 'apiKey',
+            description: 'Device / Application API key',
+            in: 'header',
+            name: 'apikey',
+          },
           Authorization: {
             type: 'apiKey',
             description: 'User token',

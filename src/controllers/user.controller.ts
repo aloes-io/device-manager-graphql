@@ -15,10 +15,10 @@ import {
   requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {AccessToken, GeneralError, User, UserCredential} from '../models';
-import {UserApi} from '../services';
-
-const resource = 'users';
+import {cache} from 'loopback-api-cache';
+import {AccessToken, Device, Measurement, Sensor, User, UserCredential} from '../models';
+import {UserApi, usersApiEndPoint} from '../services';
+import {defaultResponse, deviceLinks, getToken, userLinks, sensorLinks} from '../utils';
 
 const security = [
   {
@@ -26,56 +26,18 @@ const security = [
   },
 ];
 
-const links = {
-  devices: {
-    // operationId: 'findDevices',
-    operationId: 'findDevicesByOwnerId',
-    parameters: {
-      // filter: {where: {ownerId: '$response.body#/id'}},
-      ownerId: '$response.body#/id',
-    },
-  },
-  sensors: {
-    operationId: 'findSensors',
-    parameters: {
-      filter: {where: {ownerId: '$response.body#/id'}},
-    },
-  },
-};
-
-const defaultResponse = {
-  description: 'Default http response',
-  content: {
-    'application/json': {
-      schema: {'x-ts-type': GeneralError},
-    },
-  },
-};
-
 export class UserController {
   constructor(
     @inject('services.UserApi') protected userApi: UserApi,
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
-  @get(`/${resource}`, {
+  @get(`/${usersApiEndPoint}`, {
     operationId: 'findUsers',
     security,
-    parameters: [
-      {
-        name: 'filter',
-        in: 'query',
-        description: 'User where filter',
-        required: false,
-        explode: true,
-        style: 'deepObject',
-        schema: getFilterSchemaFor(User),
-        //  schema: {'x-ts-type': getFilterSchemaFor(User)},
-      },
-    ],
     responses: {
       '200': {
-        description: 'Array of User model instances',
+        description: 'User collection',
         content: {
           'application/json': {
             schema: {
@@ -92,47 +54,29 @@ export class UserController {
     @param.query.object('filter', getFilterSchemaFor(User))
     filter?: Filter<User>,
   ): Promise<User[]> {
-    console.log('find', this.request.headers);
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
-    return this.userApi.find(token, 50, 0, filter);
+    const token = getToken(this.request);
+    return this.userApi.find(token, filter);
   }
 
-  @post(`/${resource}`, {
+  @post(`/${usersApiEndPoint}`, {
     operationId: 'createUser',
     security,
     responses: {
       '200': {
-        description: 'User model instance',
+        description: 'User instance',
         content: {'application/json': {schema: {'x-ts-type': User}}},
       },
       default: defaultResponse,
     },
   })
   async create(@requestBody() user: User): Promise<User> {
-    console.log('create', this.request.headers);
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+    const token = getToken(this.request);
     return this.userApi.create(token, user);
   }
 
-  @get(`/${resource}/count`, {
+  @get(`/${usersApiEndPoint}/count`, {
     operationId: 'usersCount',
     security,
-    parameters: [
-      {
-        name: 'where',
-        in: 'query',
-        description: 'where filter',
-        required: false,
-        explode: true,
-        style: 'deepObject',
-        schema: getWhereSchemaFor(User),
-        // schema: {'x-ts-type': getWhereSchemaFor(User)},
-      },
-    ],
     responses: {
       '200': {
         description: 'User model count',
@@ -145,45 +89,94 @@ export class UserController {
     @param.query.object('where', getWhereSchemaFor(User))
     where?: Where<User>,
   ): Promise<Count> {
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+    const token = getToken(this.request);
     return this.userApi.count(token, where);
   }
 
-  @get(`/${resource}/{userId}`, {
+  @cache(60)
+  @get(`/${usersApiEndPoint}/{userId}`, {
     operationId: 'findUserById',
     security,
-    parameters: [
-      {
-        name: 'userId',
-        in: 'path',
-        description: 'Device instance Id',
-        required: true,
-        schema: {
-          type: 'string',
-        },
-        style: 'simple',
-      },
-    ],
     responses: {
       '200': {
-        description: 'User model instance',
+        description: 'User instance',
         content: {'application/json': {schema: {'x-ts-type': User}}},
-        links,
+        links: userLinks,
       },
       default: defaultResponse,
     },
   })
-  async findById(@param.path.string('userId') userId: string): Promise<User> {
-    console.log('findById', this.request.headers);
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+  async findById(
+    @param.path.string('userId') userId: string,
+    @param.query.object('deviceFilter', getFilterSchemaFor(Device)) deviceFilter?: Filter<Device>,
+    @param.query.object('sensorFilter', getFilterSchemaFor(Sensor)) sensorFilter?: Filter<Sensor>,
+    @param.query.object('measurementFilter', getFilterSchemaFor(Measurement))
+    measurementFilter?: Filter<Measurement>,
+  ): Promise<User> {
+    const token = getToken(this.request);
     return this.userApi.findById(token, userId);
   }
 
-  @post(`/${resource}/login`, {
+  @cache(20)
+  @get(`/${usersApiEndPoint}/{userId}/devices`, {
+    operationId: 'findUserDevices',
+    security,
+    responses: {
+      '200': {
+        description: 'Device collection',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {'x-ts-type': Device},
+            },
+          },
+        },
+        links: deviceLinks,
+      },
+      default: defaultResponse,
+    },
+  })
+  async findDevices(
+    @param.path.string('userId') userId: string,
+    @param.query.object('filter', getFilterSchemaFor(Device)) filter?: Filter<Device>,
+    @param.query.object('sensorFilter', getFilterSchemaFor(Sensor)) sensorFilter?: Filter<Sensor>,
+    @param.query.object('measurementFilter', getFilterSchemaFor(Measurement))
+    measurementFilter?: Filter<Measurement>,
+  ): Promise<Device[]> {
+    const token = getToken(this.request);
+    return this.userApi.findDevices(token, userId, filter);
+  }
+
+  @cache(20)
+  @get(`/${usersApiEndPoint}/{userId}/sensors`, {
+    operationId: 'findUserSensors',
+    security,
+    responses: {
+      '200': {
+        description: 'Sensor collection',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {'x-ts-type': Sensor},
+            },
+          },
+        },
+        links: sensorLinks,
+      },
+      default: defaultResponse,
+    },
+  })
+  async findSensors(
+    @param.path.string('userId') userId: string,
+    @param.query.object('filter', getFilterSchemaFor(Sensor)) filter?: Filter<Sensor>,
+  ): Promise<Sensor[]> {
+    const token = getToken(this.request);
+    return this.userApi.findSensors(token, userId, filter);
+  }
+
+  @post(`/${usersApiEndPoint}/login`, {
     operationId: 'userLogin',
     responses: {
       '200': {
@@ -197,7 +190,7 @@ export class UserController {
     return this.userApi.login(credentials);
   }
 
-  @post(`/${resource}/logout`, {
+  @post(`/${usersApiEndPoint}/logout`, {
     operationId: 'userLogout',
     responses: {
       '204': {
@@ -208,7 +201,6 @@ export class UserController {
     },
   })
   async logout(@requestBody() token: AccessToken): Promise<any> {
-    console.log('logout', token, this.request.headers);
     return this.userApi.logout(token);
   }
 }

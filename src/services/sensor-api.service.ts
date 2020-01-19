@@ -2,15 +2,24 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {SensorDataSource} from '../datasources';
-import {Sensor} from '../models';
+import {Measurement, Sensor} from '../models';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+export const sensorsApiBaseUrl = SensorDataSource.baseURL;
+export const sensorsApiEndPoint = SensorDataSource.endPoint;
 
 export interface SensorApi {
   count(token: string, where?: Where<Sensor>): Promise<Count>;
 
-  find(token: string, limit: number, offset: number, filter?: Filter<Sensor>): Promise<Sensor[]>;
+  find(token: string, filter?: Filter<Sensor>): Promise<Sensor[]>;
 
   findById(token: string, sensorId: string): Promise<Sensor>;
+
+  findMeasurements(
+    token: string,
+    sensorId: string,
+    filter?: Filter<Measurement>,
+  ): Promise<Measurement[]>;
 
   create(token: string, sensor: Sensor): Promise<Sensor>;
 

@@ -1,15 +1,15 @@
 import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-import config, {baseURL, endPoint} from './device.datasource.config';
+import config, {baseURL, endPoint} from './measurement.datasource.config';
 
 @lifeCycleObserver('datasource')
-export class DeviceDataSource extends juggler.DataSource implements LifeCycleObserver {
-  static dataSourceName = 'Device';
+export class MeasurementDataSource extends juggler.DataSource implements LifeCycleObserver {
+  static dataSourceName = 'Measurement';
   static endPoint = endPoint;
   static baseURL = baseURL;
 
   constructor(
-    @inject('datasources.config.Device', {optional: true})
+    @inject('datasources.config.Measurement', {optional: true})
     dsConfig: object = config,
   ) {
     super(dsConfig);

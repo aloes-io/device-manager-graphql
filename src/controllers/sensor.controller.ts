@@ -17,34 +17,16 @@ import {
   requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {Sensor, GeneralError} from '../models';
-import {SensorApi} from '../services';
-
-const resource = 'sensors';
+import {cache} from 'loopback-api-cache';
+import {Measurement, Sensor} from '../models';
+import {SensorApi, sensorsApiEndPoint} from '../services';
+import {defaultResponse, getToken, sensorLinks} from '../utils';
 
 const security = [
   {
     Authorization: [],
   },
 ];
-
-// const links = {
-//   measurements: {
-//     operationId: 'findMeasurement',
-//     parameters: {
-//       filter: {where: {sensorId: '$response.body#/id'}},
-//     },
-//   },
-// };
-
-const defaultResponse = {
-  description: 'Default http response',
-  content: {
-    'application/json': {
-      schema: {'x-ts-type': GeneralError},
-    },
-  },
-};
 
 export class SensorController {
   constructor(
@@ -53,24 +35,13 @@ export class SensorController {
   ) {}
 
   // @authorize('jwt')
-  @get(`/${resource}`, {
+  @cache(10)
+  @get(`/${sensorsApiEndPoint}`, {
     operationId: 'findSensors',
     security,
-    parameters: [
-      {
-        name: 'filter',
-        in: 'query',
-        description: 'User where filter',
-        required: false,
-        explode: true,
-        style: 'deepObject',
-        schema: getFilterSchemaFor(Sensor),
-        // schema: {'x-ts-type': getFilterSchemaFor(Sensor)},
-      },
-    ],
     responses: {
       '200': {
-        description: 'Array of Sensor model instances',
+        description: 'Sensor collection',
         content: {
           'application/json': {
             schema: {
@@ -87,49 +58,32 @@ export class SensorController {
     @param.query.object('filter', getFilterSchemaFor(Sensor))
     filter?: Filter<Sensor>,
   ): Promise<Sensor[]> {
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
-    return this.sensorApi.find(token, 50, 0, filter);
+    const token = getToken(this.request);
+    return this.sensorApi.find(token, filter);
   }
 
-  @post(`/${resource}`, {
+  @post(`/${sensorsApiEndPoint}`, {
     operationId: 'createSensor',
     security,
     responses: {
       '200': {
-        description: 'Sensor model instance',
+        description: 'Sensor instance',
         content: {'application/json': {schema: {'x-ts-type': Sensor}}},
       },
       default: defaultResponse,
     },
   })
   async create(@requestBody() device: Sensor): Promise<Sensor> {
-    console.log('createSensor', this.request.headers);
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+    const token = getToken(this.request);
     return this.sensorApi.create(token, device);
   }
 
-  @get(`/${resource}/count`, {
+  @get(`/${sensorsApiEndPoint}/count`, {
     operationId: 'sensorsCount',
     security,
-    parameters: [
-      {
-        name: 'where',
-        in: 'query',
-        description: 'where filter',
-        required: false,
-        explode: true,
-        style: 'deepObject',
-        schema: getWhereSchemaFor(Sensor),
-        // schema: {'x-ts-type': getWhereSchemaFor(Sensor)},
-      },
-    ],
     responses: {
       '200': {
-        description: 'Sensor model count',
+        description: 'Sensors count',
         content: {'application/json': {schema: CountSchema}},
       },
       default: defaultResponse,
@@ -139,42 +93,65 @@ export class SensorController {
     @param.query.object('where', getWhereSchemaFor(Sensor))
     where?: Where<Sensor>,
   ): Promise<Count> {
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+    const token = getToken(this.request);
     return this.sensorApi.count(token, where);
   }
 
-  @get(`/${resource}/{sensorId}`, {
+  @get(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'findSensorById',
     security,
-    parameters: [
-      {
-        name: 'sensorId',
-        in: 'path',
-        description: 'sensor instance Id',
-        required: true,
-        schema: {
-          type: 'string',
-        },
-        style: 'simple',
-      },
-    ],
     responses: {
       '200': {
-        description: 'Sensor model instance',
+        description: 'Sensor instance',
         content: {'application/json': {schema: {'x-ts-type': Sensor}}},
-        // links,
+        links: sensorLinks,
       },
       default: defaultResponse,
     },
   })
-  async findById(@param.path.string('sensorId') sensorId: string): Promise<Sensor> {
-    console.log('findSensorById', this.request.headers);
-    const token: string = this.request.headers.authorization
-      ? this.request.headers.authorization
-      : '';
+  async findById(
+    @param.path.string('sensorId') sensorId: string,
+    @param.query.object('measurementFilter', getFilterSchemaFor(Measurement))
+    filter?: Filter<Measurement>,
+  ): Promise<Sensor> {
+    const token = getToken(this.request);
     return this.sensorApi.findById(token, sensorId);
+  }
+
+  @cache(5)
+  @get(`/${sensorsApiEndPoint}/{sensorId}/measurements`, {
+    operationId: 'findSensorMeasurements',
+    security,
+    responses: {
+      '200': {
+        description: 'Measurement collection',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: {'x-ts-type': Measurement},
+            },
+          },
+        },
+      },
+      default: defaultResponse,
+    },
+  })
+  async findMeasurements(
+    @param.path.string('sensorId') sensorId: string,
+    @param.query.object('filter', getFilterSchemaFor(Measurement)) filter?: Filter<Measurement>,
+  ): Promise<Measurement[] | undefined> {
+    const token = getToken(this.request);
+    console.log('FIND MEASUREMENTS', filter);
+    try {
+      const measurements = await this.sensorApi.findMeasurements(token, sensorId, filter);
+      console.log('FIND MEASUREMENTS:res', measurements);
+      return measurements;
+    } catch (e) {
+      console.log('FIND MEASUREMENTS: ERR', e);
+      return undefined;
+    }
+    // return this.sensorApi.findMeasurements(token, sensorId, filter);
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */

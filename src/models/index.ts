@@ -1,4 +1,5 @@
 export * from './accessToken.model';
+export * from './cache.model';
 export * from './device.model';
 export * from './generalError.model';
 export * from './measurement.model';

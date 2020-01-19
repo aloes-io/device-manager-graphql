@@ -18,6 +18,15 @@ async function mountGraphQl(app: DeviceManagerApplication, oas: Oas3) {
       'X-Origin': 'GraphQL',
     },
     // tokenJSONpath: '$.jwt',
+    // customResolvers: {
+    //   'LoopBack Application': {
+    //     '/users/{userId}': {
+    //       get: (obj, args, ctx, info) => {
+    //         console.log('users/{userId}', obj, args, ctx);
+    //       },
+    //     },
+    //   },
+    // },
   });
 
   console.log('GRAPHQL REPORT : ', report);
@@ -50,6 +59,7 @@ export async function main(options: ApplicationConfig = {}) {
   console.log(`Server is running at ${url}`);
   console.log(`Try ${url}/ping`);
   const oas: Oas3 = <Oas3>app.restServer.getApiSpec();
+
   await mountGraphQl(app, oas);
 
   return app;

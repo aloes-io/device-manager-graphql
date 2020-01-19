@@ -77,14 +77,14 @@ export class Device extends Entity {
   })
   status: boolean;
 
-  // @property({
-  //   type: 'string',
-  //   required: true,
-  // })
-  // ownerId: string;
-  
-  @belongsTo(() => User, {keyFrom: 'ownerId', name: 'user'})
+  @property({
+    type: 'string',
+    required: true,
+  })
   ownerId: string;
+  
+  // @belongsTo(() => User, {keyFrom: 'ownerId', name: 'user'})
+  // ownerId: string;
 
   @hasMany(() => Sensor)
   sensors?: Sensor[];

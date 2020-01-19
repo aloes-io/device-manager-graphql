@@ -2,15 +2,20 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {DeviceDataSource} from '../datasources';
-import {Device, DeviceAuthResponse, DeviceCredential} from '../models';
+import {Device, DeviceAuthResponse, DeviceCredential, Sensor} from '../models';
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+export const devicesApiBaseUrl = DeviceDataSource.baseURL;
+export const devicesApiEndPoint = DeviceDataSource.endPoint;
 
 export interface DeviceApi {
   count(token: string, where?: Where<Device>): Promise<Count>;
 
-  find(token: string, limit: number, offset: number, filter?: Filter<Device>): Promise<Device[]>;
+  find(token: string, filter?: Filter<Device>): Promise<Device[]>;
 
   findById(token: string, deviceId: string): Promise<Device>;
+
+  findSensors(token: string, deviceId: string, filter?: Filter<Sensor>): Promise<Sensor[]>;
 
   create(token: string, device: Device): Promise<Device>;
 

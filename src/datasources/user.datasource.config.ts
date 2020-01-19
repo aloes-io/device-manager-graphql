@@ -8,8 +8,8 @@ const result = dotenv.config();
 const host = result.parsed ? result.parsed.ALOES_SERVER_HOST : 'localhost:8000';
 const scheme = result.parsed ? result.parsed.ALOES_SERVER_SCHEME : 'http';
 const basePath = result.parsed ? result.parsed.ALOES_SERVER_API_ROOT : '/api';
-const baseURL = `${scheme}://${host}${basePath}`;
-const resource = 'Users';
+export const baseURL = `${scheme}://${host}${basePath}`;
+export const endPoint = 'Users';
 
 const userDefintion = {
   name: 'User',
@@ -27,24 +27,22 @@ const userDefintion = {
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}`,
+        url: `${baseURL}/${endPoint}`,
         headers: {
           authorization: '{token}',
         },
         query: {
-          limit: '{limit}',
-          offset: '{offset}',
           filter: '{filter}',
         },
       },
       functions: {
-        find: ['token', 'limit', 'offset', 'filter'],
+        find: ['token', 'filter'],
       },
     },
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}/count`,
+        url: `${baseURL}/${endPoint}/count`,
         headers: {
           authorization: '{token}',
         },
@@ -59,7 +57,7 @@ const userDefintion = {
     {
       template: {
         method: 'POST',
-        url: `${baseURL}/${resource}`,
+        url: `${baseURL}/${endPoint}`,
         headers: {
           authorization: '{token}',
         },
@@ -72,7 +70,7 @@ const userDefintion = {
     {
       template: {
         method: 'GET',
-        url: `${baseURL}/${resource}/{userId}`,
+        url: `${baseURL}/${endPoint}/{userId}`,
         headers: {
           authorization: '{token}',
         },
@@ -83,8 +81,38 @@ const userDefintion = {
     },
     {
       template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{userId}/devices`,
+        headers: {
+          authorization: '{token}',
+        },
+        query: {
+          filter: '{filter}',
+        },
+      },
+      functions: {
+        findDevices: ['token', 'userId', 'filter'],
+      },
+    },
+    {
+      template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{userId}/sensors`,
+        headers: {
+          authorization: '{token}',
+        },
+        query: {
+          filter: '{filter}',
+        },
+      },
+      functions: {
+        findSensors: ['token', 'userId', 'filter'],
+      },
+    },
+    {
+      template: {
         method: 'PUT',
-        url: `${baseURL}/${resource}/{userId}`,
+        url: `${baseURL}/${endPoint}/{userId}`,
         headers: {
           authorization: '{token}',
         },
@@ -97,7 +125,7 @@ const userDefintion = {
     {
       template: {
         method: 'POST',
-        url: `${baseURL}/${resource}/login`,
+        url: `${baseURL}/${endPoint}/login`,
         body: '{credentials}',
       },
       functions: {
@@ -107,7 +135,7 @@ const userDefintion = {
     {
       template: {
         method: 'POST',
-        url: `${baseURL}/${resource}/logout`,
+        url: `${baseURL}/${endPoint}/logout`,
         body: '{token}',
       },
       functions: {
