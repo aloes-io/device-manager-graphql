@@ -1,10 +1,16 @@
-import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
+import {
+  inject,
+  lifeCycleObserver,
+  LifeCycleObserver,
+  ValueOrPromise,
+} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 // import config from './user.datasource.config.json';
 import config, {baseURL, endPoint} from './user.datasource.config';
 
 @lifeCycleObserver('datasource')
-export class UserDataSource extends juggler.DataSource implements LifeCycleObserver {
+export class UserDataSource extends juggler.DataSource
+  implements LifeCycleObserver {
   static dataSourceName = 'User';
   static endPoint = endPoint;
   static baseURL = baseURL;

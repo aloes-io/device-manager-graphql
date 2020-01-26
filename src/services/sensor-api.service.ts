@@ -1,9 +1,8 @@
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {Count, CountSchema, Filter, Where} from '@loopback/repository';
+import {Count, Filter, Where} from '@loopback/repository';
 import {SensorDataSource} from '../datasources';
 import {Measurement, Sensor} from '../models';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export const sensorsApiBaseUrl = SensorDataSource.baseURL;
 export const sensorsApiEndPoint = SensorDataSource.endPoint;
@@ -24,6 +23,10 @@ export interface SensorApi {
   create(token: string, sensor: Sensor): Promise<Sensor>;
 
   replaceById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
+
+  updateById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
+
+  deleteById(token: string, sensorId: string): Promise<{id: string}>;
 }
 
 export class SensorApiProvider implements Provider<SensorApi> {
@@ -36,4 +39,3 @@ export class SensorApiProvider implements Provider<SensorApi> {
     return getService(this.dataSource);
   }
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

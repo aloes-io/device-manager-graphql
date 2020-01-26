@@ -81,6 +81,31 @@ const deviceDefintion = {
     },
     {
       template: {
+        method: 'PUT',
+        url: `${baseURL}/${endPoint}/{deviceId}`,
+        headers: {
+          authorization: '{token}',
+        },
+        body: '{device}',
+      },
+      functions: {
+        replaceById: ['token', 'deviceId', 'device'],
+      },
+    },
+    {
+      template: {
+        method: 'DELETE',
+        url: `${baseURL}/${endPoint}/{deviceId}`,
+        headers: {
+          authorization: '{token}',
+        },
+      },
+      functions: {
+        deleteById: ['token', 'deviceId'],
+      },
+    },
+    {
+      template: {
         method: 'GET',
         url: `${baseURL}/${endPoint}/{deviceId}/sensors`,
         headers: {
@@ -96,15 +121,17 @@ const deviceDefintion = {
     },
     {
       template: {
-        method: 'PUT',
-        url: `${baseURL}/${endPoint}/{deviceId}`,
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{deviceId}/sensors/count`,
         headers: {
           authorization: '{token}',
         },
-        body: '{device}',
+        query: {
+          where: '{where}',
+        },
       },
       functions: {
-        replaceById: ['token', 'deviceId', 'device'],
+        findSensorsCount: ['token', 'deviceId', 'where'],
       },
     },
     {

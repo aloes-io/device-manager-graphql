@@ -1,4 +1,10 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import {
+  belongsTo,
+  Entity,
+  hasMany,
+  model,
+  property,
+} from '@loopback/repository';
 import {Device} from './device.model';
 import {Measurement} from './measurement.model';
 import {User} from './user.model';
@@ -50,9 +56,9 @@ export class Sensor extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  nativeNodeId: string;
+  nativeNodeId?: string;
 
   @property({
     type: 'string',
@@ -70,31 +76,31 @@ export class Sensor extends Entity {
     type: 'string',
     required: false,
   })
-  inPrefix: string;
+  inPrefix?: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  outPrefix: string;
+  outPrefix?: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  value: string;
+  value?: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  description: string;
+  description?: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  lastSignal: string;
+  lastSignal?: string;
 
   @property({
     type: 'number',
@@ -112,7 +118,7 @@ export class Sensor extends Entity {
     type: 'string',
     required: false,
   })
-  transportProtocolVersion: string;
+  transportProtocolVersion?: string;
 
   @property({
     type: 'string',
@@ -124,13 +130,7 @@ export class Sensor extends Entity {
     type: 'string',
     required: false,
   })
-  messageProtocolVersion: string;
-
-  @property({
-    type: 'boolean',
-    required: true,
-  })
-  status: boolean;
+  messageProtocolVersion?: string;
 
   @property({
     type: 'array',

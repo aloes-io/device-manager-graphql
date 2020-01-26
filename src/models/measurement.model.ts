@@ -25,13 +25,13 @@ export class Measurement extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
   resource: string;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
   type: string;
 
@@ -39,16 +39,16 @@ export class Measurement extends Entity {
     type: 'string',
     required: false,
   })
-  nativeSensorId: string;
+  nativeSensorId?: string;
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  nativeNodeId: string;
+  nativeNodeId?: string;
 
-  // @belongsTo(() => Device)
-  // deviceId: string;
+  @belongsTo(() => Device)
+  deviceId: string;
 
   @belongsTo(() => Sensor)
   sensorId: string;

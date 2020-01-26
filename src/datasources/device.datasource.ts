@@ -1,9 +1,15 @@
-import {inject, lifeCycleObserver, LifeCycleObserver, ValueOrPromise} from '@loopback/core';
+import {
+  inject,
+  lifeCycleObserver,
+  LifeCycleObserver,
+  ValueOrPromise,
+} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 import config, {baseURL, endPoint} from './device.datasource.config';
 
 @lifeCycleObserver('datasource')
-export class DeviceDataSource extends juggler.DataSource implements LifeCycleObserver {
+export class DeviceDataSource extends juggler.DataSource
+  implements LifeCycleObserver {
   static dataSourceName = 'Device';
   static endPoint = endPoint;
   static baseURL = baseURL;

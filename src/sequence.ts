@@ -10,6 +10,12 @@ import {
   SequenceHandler,
 } from '@loopback/rest';
 import {CacheBindings, CacheCheckFn, CacheSetFn} from 'loopback-api-cache';
+import {
+  PubSubBindings,
+  PubSubPublishFn,
+  PubSubCallbackFn,
+  CallbackObject,
+} from 'loopback-pubsub-component';
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -20,9 +26,21 @@ export class MySequence implements SequenceHandler {
     @inject(SequenceActions.INVOKE_METHOD) protected invoke: InvokeMethod,
     @inject(SequenceActions.SEND) public send: Send,
     @inject(SequenceActions.REJECT) public reject: Reject,
-    @inject(CacheBindings.CACHE_CHECK_ACTION) protected checkCache: CacheCheckFn,
+    @inject(CacheBindings.CACHE_CHECK_ACTION)
+    protected checkCache: CacheCheckFn,
     @inject(CacheBindings.CACHE_SET_ACTION) protected setCache: CacheSetFn,
+    @inject(PubSubBindings.PUBSUB_PUBLISH_ACTION)
+    protected publish: PubSubPublishFn,
+    @inject(PubSubBindings.PUBSUB_CALLBACK_ACTION)
+    protected checkCallback: PubSubCallbackFn,
   ) {}
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async triggerCallback(callback: CallbackObject, result: any) {
+    // compose route and payload from CallbackObject with response, request object then ...
+    const route = `${callback.path}/${callback.method}`;
+    await this.publish(route, result);
+  }
 
   async handle(context: RequestContext) {
     try {
@@ -30,19 +48,26 @@ export class MySequence implements SequenceHandler {
       const route = this.findRoute(request);
       const args = await this.parseParams(request, route);
 
-      // Important part added to check for cache and respond with that if found
+      const callback = await this.checkCallback(request, response);
+
       const cache = await this.checkCache(request);
       if (cache) {
-        console.log('FOUND CACHE', cache.ttl);
         this.send(response, cache.data);
+        if (callback) {
+          await this.triggerCallback(callback, cache.data);
+        }
         return;
       }
 
       const result = await this.invoke(route, args);
+
+      if (callback) {
+        await this.triggerCallback(callback, result);
+      }
+
       this.send(response, result);
 
-      // Important part added to set cache with the result
-      this.setCache(request, result);
+      await this.setCache(request, result);
     } catch (err) {
       this.reject(context, err);
     }

@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
-import {Count, CountSchema, Filter, Where} from '@loopback/repository';
+import {Count, Filter, Where} from '@loopback/repository';
 import {UserDataSource} from '../datasources';
 import {AccessToken, Device, Sensor, UserCredential, User} from '../models';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const usersApiBaseUrl = UserDataSource.baseURL;
 export const usersApiEndPoint = UserDataSource.endPoint;
 
@@ -14,9 +15,29 @@ export interface UserApi {
 
   findById(token: string, userId: string): Promise<User>;
 
-  findDevices(token: string, userId: string, filter?: Filter<Device>): Promise<Device[]>;
+  findDevices(
+    token: string,
+    userId: string,
+    filter?: Filter<Device>,
+  ): Promise<Device[]>;
 
-  findSensors(token: string, userId: string, filter?: Filter<Sensor>): Promise<Sensor[]>;
+  findDevicesCount(
+    token: string,
+    userId: string,
+    where?: Where<Device>,
+  ): Promise<Count>;
+
+  findSensors(
+    token: string,
+    userId: string,
+    filter?: Filter<Sensor>,
+  ): Promise<Sensor[]>;
+
+  findSensorsCount(
+    token: string,
+    userId: string,
+    where?: Where<Sensor>,
+  ): Promise<Count>;
 
   create(token: string, user: User): Promise<User>;
 

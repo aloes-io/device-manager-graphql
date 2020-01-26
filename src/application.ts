@@ -1,20 +1,39 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-import {RestExplorerBindings, RestExplorerComponent} from '@loopback/rest-explorer';
+import {
+  RestExplorerBindings,
+  RestExplorerComponent,
+} from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
+// import {HttpServer} from '@loopback/http-server';
+
 import {ServiceMixin} from '@loopback/service-proxy';
 import {CacheBindings, CacheComponent} from 'loopback-api-cache';
+import {PubSubBindings, PubSubComponent} from 'loopback-pubsub-component';
 import path from 'path';
 import merge from 'lodash.merge';
-import {CacheStrategyProvider} from './providers';
+
+// import {WebSocketServer} from './websocket.server';
+import {CacheStrategyProvider, PubSubStrategyProvider} from './providers';
 import {MySequence} from './sequence';
 
 export class DeviceManagerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
+  // readonly httpServer: HttpServer;
+  // readonly wsServer: WebSocketServer;
+
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    this.component(PubSubComponent);
+    this.bind(PubSubBindings.PUBSUB_STRATEGY).toProvider(
+      PubSubStrategyProvider,
+    );
+    // this.bind(PubSubBindings.PUBSUB_CONFIG).to({
+    //   host: 'localhost',
+    // });
 
     this.component(CacheComponent);
     this.bind(CacheBindings.CACHE_STRATEGY).toProvider(CacheStrategyProvider);
@@ -28,22 +47,7 @@ export class DeviceManagerApplication extends BootMixin(
     merge(spec, {
       components: {
         securitySchemes: {
-          // BearerAuth: {
-          //   type: 'http',
-          //   scheme: 'bearer',
-          // },
-          ApiKey: {
-            type: 'apiKey',
-            description: 'Device / Application API key',
-            in: 'header',
-            name: 'apikey',
-          },
-          Authorization: {
-            type: 'apiKey',
-            description: 'User token',
-            in: 'header',
-            name: 'authorization',
-          },
+          ...options.securitySchemes,
         },
       },
     });
@@ -54,13 +58,15 @@ export class DeviceManagerApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
 
-    // this.mqttClient = connect(
-    //   options.mqtt.url,
-    //   options.mqtt.options,
-    // );
-    // this.mqttClient.on('connect', () => {
-    //   console.log('mqtt client connected!');
+    // Create ws server from the http server
+    // const wsServer = new WebSocketServer(this.httpServer);
+    // this.bind('servers.websocket.server1').to(wsServer);
+    // wsServer.use((socket, next) => {
+    //   console.log('Global middleware - socket:', socket.id);
+    //   next();
     // });
+    // // Add a route
+    // this.wsServer = wsServer;
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -73,4 +79,12 @@ export class DeviceManagerApplication extends BootMixin(
       },
     };
   }
+
+  // start() {
+  //   return this.wsServer.start();
+  // }
+
+  // stop() {
+  //   return this.wsServer.stop();
+  // }
 }

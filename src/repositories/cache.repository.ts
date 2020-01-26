@@ -1,4 +1,4 @@
-import {DefaultKeyValueRepository, DefaultCrudRepository, juggler} from '@loopback/repository';
+import {DefaultKeyValueRepository} from '@loopback/repository';
 import {Cache} from '../models';
 import {CacheDataSource} from '../datasources';
 import {inject} from '@loopback/core';

@@ -46,6 +46,7 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^3.3.0",
     "@loopback/authorization": "^0.4.7",
     "@loopback/boot": "^1.7.1",
     "@loopback/context": "^1.25.1",
@@ -61,7 +62,10 @@
     "lodash.merge": "^4.6.2",
     "loopback-api-cache": "git+https://git@github.com/getlarge/loopback-api-cache#build",
     "loopback-connector-rest": "^3.6.0",
-    "openapi-to-graphql": "^1.7.0"
+    "loopback-pubsub-component": "^0.1.0",
+    "mqtt": "^3.0.0",
+    "openapi-to-graphql": "^1.7.0",
+    "subscriptions-transport-ws": "^0.9.16"
   },
   "devDependencies": {
     "@loopback/build": "^3.0.1",
@@ -76,6 +80,7 @@
     "eslint-plugin-eslint-plugin": "^2.1.0",
     "eslint-plugin-mocha": "^6.2.2",
     "eslint-plugin-security": "^1.4.0",
+    "prettier": "^1.17.1",
     "source-map-support": "^0.5.16",
     "typescript": "~3.7.4"
   },

@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 // import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/context';
-import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  repository,
+  Where,
+} from '@loopback/repository';
 import {
   post,
   param,
@@ -18,6 +22,7 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
+import {callback} from 'loopback-pubsub-component';
 import {Measurement, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
 import {defaultResponse, getToken, sensorLinks} from '../utils';
@@ -35,7 +40,7 @@ export class SensorController {
   ) {}
 
   // @authorize('jwt')
-  @cache(10)
+  @cache(20)
   @get(`/${sensorsApiEndPoint}`, {
     operationId: 'findSensors',
     security,
@@ -50,6 +55,7 @@ export class SensorController {
             },
           },
         },
+        links: sensorLinks,
       },
       default: defaultResponse,
     },
@@ -78,6 +84,7 @@ export class SensorController {
     return this.sensorApi.create(token, device);
   }
 
+  @cache(20)
   @get(`/${sensorsApiEndPoint}/count`, {
     operationId: 'sensorsCount',
     security,
@@ -97,6 +104,7 @@ export class SensorController {
     return this.sensorApi.count(token, where);
   }
 
+  @cache(20)
   @get(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'findSensorById',
     security,
@@ -118,7 +126,64 @@ export class SensorController {
     return this.sensorApi.findById(token, sensorId);
   }
 
-  @cache(5)
+  @callback(`/${sensorsApiEndPoint}`, 'put')
+  @patch(`/${sensorsApiEndPoint}/{sensorId}`, {
+    operationId: 'updateSensorById',
+    security,
+    responses: {
+      '200': {
+        description: 'Sensor instance',
+        content: {'application/json': {schema: {'x-ts-type': Sensor}}},
+      },
+      default: defaultResponse,
+    },
+    // callbacks
+  })
+  async updateById(
+    @param.path.string('sensorId') sensorId: string,
+    @requestBody() sensor: Sensor,
+  ): Promise<Sensor> {
+    const token = getToken(this.request);
+    return this.sensorApi.updateById(token, sensorId, sensor);
+  }
+
+  @callback(`/${sensorsApiEndPoint}`, 'put')
+  @put(`/${sensorsApiEndPoint}/{sensorId}`, {
+    operationId: 'replaceSensorById',
+    security,
+    responses: {
+      '200': {
+        description: 'Sensor instance',
+        content: {'application/json': {schema: {'x-ts-type': Sensor}}},
+      },
+      default: defaultResponse,
+    },
+    // callbacks
+  })
+  async replaceById(
+    @param.path.string('sensorId') sensorId: string,
+    @requestBody() sensor: Sensor,
+  ): Promise<Sensor> {
+    const token = getToken(this.request);
+    return this.sensorApi.replaceById(token, sensorId, sensor);
+  }
+
+  @callback(`/${sensorsApiEndPoint}`, 'delete')
+  @del(`/${sensorsApiEndPoint}/{sensorId}`, {
+    operationId: 'deleteSensorById',
+    security,
+    responses: {
+      default: defaultResponse,
+    },
+  })
+  async deleteById(
+    @param.path.string('sensorId') sensorId: string,
+  ): Promise<{id: string}> {
+    const token = getToken(this.request);
+    return this.sensorApi.deleteById(token, sensorId);
+  }
+
+  @cache(10)
   @get(`/${sensorsApiEndPoint}/{sensorId}/measurements`, {
     operationId: 'findSensorMeasurements',
     security,
@@ -139,20 +204,22 @@ export class SensorController {
   })
   async findMeasurements(
     @param.path.string('sensorId') sensorId: string,
-    @param.query.object('filter', getFilterSchemaFor(Measurement)) filter?: Filter<Measurement>,
-  ): Promise<Measurement[] | undefined> {
+    @param.query.object('filter', getFilterSchemaFor(Measurement))
+    filter?: Filter<Measurement>,
+  ): Promise<Measurement[] | null> {
     const token = getToken(this.request);
-    console.log('FIND MEASUREMENTS', filter);
     try {
-      const measurements = await this.sensorApi.findMeasurements(token, sensorId, filter);
-      console.log('FIND MEASUREMENTS:res', measurements);
+      const measurements = await this.sensorApi.findMeasurements(
+        token,
+        sensorId,
+        filter,
+      );
       return measurements;
     } catch (e) {
       console.log('FIND MEASUREMENTS: ERR', e);
-      return undefined;
+      return null;
     }
     // return this.sensorApi.findMeasurements(token, sensorId, filter);
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
-/* eslint-enable @typescript-eslint/no-explicit-any */

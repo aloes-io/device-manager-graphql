@@ -97,6 +97,21 @@ const userDefintion = {
     {
       template: {
         method: 'GET',
+        url: `${baseURL}/${endPoint}/{userId}/devices/count`,
+        headers: {
+          authorization: '{token}',
+        },
+        query: {
+          where: '{where}',
+        },
+      },
+      functions: {
+        findDevicesCount: ['token', 'userId', 'where'],
+      },
+    },
+    {
+      template: {
+        method: 'GET',
         url: `${baseURL}/${endPoint}/{userId}/sensors`,
         headers: {
           authorization: '{token}',
@@ -107,6 +122,21 @@ const userDefintion = {
       },
       functions: {
         findSensors: ['token', 'userId', 'filter'],
+      },
+    },
+    {
+      template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{userId}/sensors/count`,
+        headers: {
+          authorization: '{token}',
+        },
+        query: {
+          where: '{where}',
+        },
+      },
+      functions: {
+        findSensorsCount: ['token', 'userId', 'where'],
       },
     },
     {

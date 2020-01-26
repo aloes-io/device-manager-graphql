@@ -81,6 +81,44 @@ const sensorDefinition = {
     },
     {
       template: {
+        method: 'PUT',
+        url: `${baseURL}/${endPoint}/{sensorId}`,
+        headers: {
+          authorization: '{token}',
+        },
+        body: '{sensor}',
+      },
+      functions: {
+        replaceById: ['token', 'sensorId', 'sensor'],
+      },
+    },
+    {
+      template: {
+        method: 'PATCH',
+        url: `${baseURL}/${endPoint}/{sensorId}`,
+        headers: {
+          authorization: '{token}',
+        },
+        body: '{sensor}',
+      },
+      functions: {
+        updateById: ['token', 'sensorId', 'sensor'],
+      },
+    },
+    {
+      template: {
+        method: 'DELETE',
+        url: `${baseURL}/${endPoint}/{sensorId}`,
+        headers: {
+          authorization: '{token}',
+        },
+      },
+      functions: {
+        deleteById: ['token', 'sensorId'],
+      },
+    },
+    {
+      template: {
         method: 'GET',
         url: `${baseURL}/${endPoint}/{sensorId}/measurements`,
         headers: {
@@ -92,19 +130,6 @@ const sensorDefinition = {
       },
       functions: {
         findMeasurements: ['token', 'sensorId', 'filter'],
-      },
-    },
-    {
-      template: {
-        method: 'PUT',
-        url: `${baseURL}/${endPoint}/{sensorId}`,
-        headers: {
-          authorization: '{token}',
-        },
-        body: '{sensor}',
-      },
-      functions: {
-        replaceById: ['token', 'sensorId', 'sensor'],
       },
     },
   ],

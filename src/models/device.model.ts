@@ -1,4 +1,10 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import {
+  belongsTo,
+  Entity,
+  hasMany,
+  model,
+  property,
+} from '@loopback/repository';
 import {User} from './user.model';
 import {Sensor} from './sensor.model';
 
@@ -45,13 +51,13 @@ export class Device extends Entity {
     type: 'string',
     required: false,
   })
-  description: string;
+  description?: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  lastSignal: string;
+  lastSignal?: string;
 
   @property({
     type: 'number',
@@ -61,15 +67,39 @@ export class Device extends Entity {
 
   @property({
     type: 'string',
-    required: false,
+    required: true,
   })
-  accessPointUrl: string;
+  transportProtocol: string;
 
   @property({
     type: 'string',
     required: false,
   })
-  qrCode: string;
+  transportProtocolVersion?: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  messageProtocol: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  messageProtocolVersion?: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  accessPointUrl?: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  qrCode?: string;
 
   @property({
     type: 'boolean',
@@ -79,12 +109,12 @@ export class Device extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
+  createdAt?: string;
+
+  @belongsTo(() => User, {keyFrom: 'ownerId', name: 'user'})
   ownerId: string;
-  
-  // @belongsTo(() => User, {keyFrom: 'ownerId', name: 'user'})
-  // ownerId: string;
 
   @hasMany(() => Sensor)
   sensors?: Sensor[];
@@ -134,4 +164,3 @@ export class DeviceCredential extends Entity {
     super(data);
   }
 }
-

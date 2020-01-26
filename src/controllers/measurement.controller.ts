@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {inject} from '@loopback/context';
-import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  repository,
+  Where,
+} from '@loopback/repository';
 import {
   post,
   param,
@@ -33,33 +38,6 @@ export class MeasurementController {
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
-  // @cache(10)
-  // @get(`/${measurementsApiEndPoint}`, {
-  //   operationId: 'findMeasurements',
-  //   security,
-  //   responses: {
-  //     '200': {
-  //       description: 'Measurement collection',
-  //       content: {
-  //         'application/json': {
-  //           schema: {
-  //             type: 'array',
-  //             items: {'x-ts-type': Measurement},
-  //           },
-  //         },
-  //       },
-  //     },
-  //     default: defaultResponse,
-  //   },
-  // })
-  // async count(
-  //   @param.query.object('where', getWhereSchemaFor(Measurement))
-  //   where?: Where<Measurement>,
-  // ): Promise<Measurement[]> {
-  //   const token = getToken(this.request);
-  //   return this.measurementApi.find(token, where);
-  // }
-
   @cache(10)
   @get(`/${measurementsApiEndPoint}`, {
     operationId: 'findMeasurements',
@@ -82,9 +60,16 @@ export class MeasurementController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Measurement))
     filter?: Filter<Measurement>,
-  ): Promise<Measurement[]> {
+  ): Promise<Measurement[] | null> {
     const token = getToken(this.request);
-    return this.measurementApi.find(token, filter);
+    try {
+      const measurements = await this.measurementApi.find(token, filter);
+      return measurements;
+    } catch (e) {
+      console.log('FIND MEASUREMENTS: ERR', e);
+      return null;
+    }
+    // return this.measurementApi.find(token, filter);
   }
 
   @cache(30)
@@ -99,10 +84,11 @@ export class MeasurementController {
       default: defaultResponse,
     },
   })
-  async findById(@param.path.string('measurementId') measurementId: string): Promise<Measurement> {
+  async findById(
+    @param.path.string('measurementId') measurementId: string,
+  ): Promise<Measurement> {
     const token = getToken(this.request);
     return this.measurementApi.findById(token, measurementId);
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
-/* eslint-enable @typescript-eslint/no-explicit-any */

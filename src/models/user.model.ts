@@ -1,5 +1,6 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Device} from './device.model';
+import {Sensor} from './sensor.model';
 
 @model({settings: {}})
 export class User extends Entity {
@@ -54,6 +55,9 @@ export class User extends Entity {
 
   @hasMany(() => Device, {keyTo: 'ownerId'})
   devices?: Device[];
+
+  @hasMany(() => Sensor, {keyTo: 'ownerId'})
+  sensors?: Sensor[];
 
   constructor(data?: Partial<User>) {
     super(data);

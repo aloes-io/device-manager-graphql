@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Entity, model, property} from '@loopback/repository';
 
 @model({settings: {hidden: ['id']}})
@@ -32,3 +33,4 @@ export interface CacheRelations {
 }
 
 export type CacheWithRelations = Cache & CacheRelations;
+/* eslint-enable @typescript-eslint/no-explicit-any */

@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {inject, Provider, ValueOrPromise} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {Request, Response} from '@loopback/rest';
+import {Request} from '@loopback/rest';
 import {CacheBindings, CacheMetadata, CacheStrategy} from 'loopback-api-cache';
 import {Cache} from '../models';
 import {CacheRepository} from '../repositories';
 
-export class CacheStrategyProvider implements Provider<CacheStrategy | undefined> {
+export class CacheStrategyProvider
+  implements Provider<CacheStrategy | undefined> {
   constructor(
-    @inject(CacheBindings.METADATA)
-    private metadata: CacheMetadata,
+    @inject(CacheBindings.METADATA) private metadata: CacheMetadata,
     @repository(CacheRepository) protected cacheRepo: CacheRepository,
   ) {}
 
@@ -43,7 +44,8 @@ export class CacheStrategyProvider implements Provider<CacheStrategy | undefined
       set: async (req: Request, result: any) => {
         const cacheKey = getCacheKey(req);
         // console.log('SET CACHE', cacheKey);
-        const ttl = this.metadata.ttl && this.metadata.ttl > 0 ? this.metadata.ttl : 0;
+        const ttl =
+          this.metadata.ttl && this.metadata.ttl > 0 ? this.metadata.ttl : 0;
         const cache = new Cache({id: cacheKey, data: result, ttl});
         this.cacheRepo.set(cacheKey, cache, {ttl: ttl * 1000}).catch(err => {
           console.error(err);
@@ -52,3 +54,4 @@ export class CacheStrategyProvider implements Provider<CacheStrategy | undefined
     };
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

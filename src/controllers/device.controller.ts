@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {inject} from '@loopback/context';
 import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
 import {
@@ -16,7 +15,7 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
-// import merge from 'lodash.merge';
+import {callback} from 'loopback-pubsub-component';
 import {Device, DeviceAuthResponse, DeviceCredential, Measurement, Sensor} from '../models';
 import {DeviceApi, devicesApiEndPoint} from '../services';
 import {defaultResponse, deviceLinks, getToken, sensorLinks} from '../utils';
@@ -33,7 +32,8 @@ export class DeviceController {
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
-  @cache(10)
+  @callback(`/${devicesApiEndPoint}`, 'get')
+  @cache(30)
   @get(`/${devicesApiEndPoint}`, {
     operationId: 'findDevices',
     security,
@@ -48,6 +48,7 @@ export class DeviceController {
             },
           },
         },
+        links: deviceLinks,
       },
       default: defaultResponse,
     },
@@ -60,6 +61,7 @@ export class DeviceController {
     return this.deviceApi.find(token, filter);
   }
 
+  @callback(`/${devicesApiEndPoint}`, 'post')
   @post(`/${devicesApiEndPoint}`, {
     operationId: 'createDevice',
     security,
@@ -70,12 +72,14 @@ export class DeviceController {
       },
       default: defaultResponse,
     },
+    // callbacks
   })
   async create(@requestBody() device: Device): Promise<Device> {
     const token = getToken(this.request);
     return this.deviceApi.create(token, device);
   }
 
+  @cache(30)
   @get(`/${devicesApiEndPoint}/count`, {
     operationId: 'devicesCount',
     security,
@@ -95,7 +99,7 @@ export class DeviceController {
     return this.deviceApi.count(token, where);
   }
 
-  @cache(20)
+  @cache(30)
   @get(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'findDeviceById',
     security,
@@ -110,13 +114,50 @@ export class DeviceController {
   })
   async findById(
     @param.path.string('deviceId') deviceId: string,
-    @param.query.object('sensorFilter', getFilterSchemaFor(Sensor)) sensorFilter?: Filter<Sensor>,
+    @param.query.object('sensorFilter', getFilterSchemaFor(Sensor))
+    sensorFilter?: Filter<Sensor>,
   ): Promise<Device> {
     const token = getToken(this.request);
     return this.deviceApi.findById(token, deviceId);
   }
 
-  @cache(15)
+  @callback(`/${devicesApiEndPoint}`, 'put')
+  @put(`/${devicesApiEndPoint}/{deviceId}`, {
+    operationId: 'replaceDeviceById',
+    security,
+    responses: {
+      '200': {
+        description: 'Device instance',
+        content: {'application/json': {schema: {'x-ts-type': Device}}},
+      },
+      default: defaultResponse,
+    },
+    // callbacks
+  })
+  async replaceById(
+    @param.path.string('deviceId') deviceId: string,
+    @requestBody() device: Device,
+  ): Promise<Device> {
+    const token = getToken(this.request);
+    return this.deviceApi.replaceById(token, deviceId, device);
+  }
+
+  @callback(`/${devicesApiEndPoint}`, 'delete')
+  @del(`/${devicesApiEndPoint}/{deviceId}`, {
+    operationId: 'deleteDeviceById',
+    security,
+    responses: {
+      default: defaultResponse,
+    },
+    // callbacks
+  })
+  async deleteById(@param.path.string('deviceId') deviceId: string): Promise<{id: string}> {
+    const token = getToken(this.request);
+    return this.deviceApi.deleteById(token, deviceId);
+  }
+
+  @callback(`/${devicesApiEndPoint}/{deviceId}`, 'get')
+  @cache(20)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors`, {
     operationId: 'findDeviceSensors',
     security,
@@ -138,12 +179,34 @@ export class DeviceController {
   })
   async findSensors(
     @param.path.string('deviceId') deviceId: string,
-    @param.query.object('filter', getFilterSchemaFor(Sensor)) filter?: Filter<Sensor>,
+    @param.query.object('filter', getFilterSchemaFor(Sensor))
+    filter?: Filter<Sensor>,
     @param.query.object('measurementFilter', getFilterSchemaFor(Measurement))
     measurementFilter?: Filter<Measurement>,
-  ): Promise<Sensor[]> {
+  ): Promise<Sensor[] | null> {
     const token = getToken(this.request);
     return this.deviceApi.findSensors(token, deviceId, filter);
+  }
+
+  @cache(20)
+  @get(`/${devicesApiEndPoint}/{deviceId}/sensors/count`, {
+    operationId: 'findDeviceSensorsCount',
+    security,
+    responses: {
+      '200': {
+        description: 'Sensors count',
+        content: {'application/json': {schema: CountSchema}},
+      },
+      default: defaultResponse,
+    },
+  })
+  async findSensorsCount(
+    @param.path.string('deviceId') deviceId: string,
+    @param.query.object('where', getWhereSchemaFor(Sensor))
+    where?: Where<Sensor>,
+  ): Promise<Count> {
+    const token = getToken(this.request);
+    return this.deviceApi.findSensorsCount(token, deviceId, where);
   }
 
   // @cache(20)
@@ -195,4 +258,3 @@ export class DeviceController {
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
-/* eslint-enable @typescript-eslint/no-explicit-any */
