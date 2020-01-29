@@ -7,15 +7,21 @@ import {
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
 // import {HttpServer} from '@loopback/http-server';
-
 import {ServiceMixin} from '@loopback/service-proxy';
 import {CacheBindings, CacheComponent} from 'loopback-api-cache';
+import {CallbackBindings, CallbackComponent} from 'loopback-callback-component';
 import {PubSubBindings, PubSubComponent} from 'loopback-pubsub-component';
+import {EventEmitter} from 'events';
+import {connect} from 'mqtt';
 import path from 'path';
 import merge from 'lodash.merge';
 
 // import {WebSocketServer} from './websocket.server';
-import {CacheStrategyProvider, PubSubStrategyProvider} from './providers';
+import {
+  CacheStrategyProvider,
+  CallbackStrategyProvider,
+  PubSubStrategyProvider,
+} from './providers';
 import {MySequence} from './sequence';
 
 export class DeviceManagerApplication extends BootMixin(
@@ -27,13 +33,22 @@ export class DeviceManagerApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
+    const mqttClient = connect(options.mqtt.url, {
+      ...options.mqtt.options,
+    });
+    this.bind(PubSubBindings.CONFIG).to({
+      eventEmitter: new EventEmitter(),
+      client: mqttClient,
+    });
     this.component(PubSubComponent);
     this.bind(PubSubBindings.PUBSUB_STRATEGY).toProvider(
       PubSubStrategyProvider,
     );
-    // this.bind(PubSubBindings.PUBSUB_CONFIG).to({
-    //   host: 'localhost',
-    // });
+
+    this.component(CallbackComponent);
+    this.bind(CallbackBindings.CALLBACK_STRATEGY).toProvider(
+      CallbackStrategyProvider,
+    );
 
     this.component(CacheComponent);
     this.bind(CacheBindings.CACHE_STRATEGY).toProvider(CacheStrategyProvider);

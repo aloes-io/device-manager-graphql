@@ -22,7 +22,7 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
-import {callback} from 'loopback-pubsub-component';
+import {callback} from 'loopback-callback-component';
 import {Measurement, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
 import {defaultResponse, getToken, sensorLinks} from '../utils';
@@ -68,9 +68,26 @@ export class SensorController {
     return this.sensorApi.find(token, filter);
   }
 
+  @callback(
+    'sensorWatcher',
+    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    'post',
+    {path: `/${sensorsApiEndPoint}`, method: 'post'},
+  )
   @post(`/${sensorsApiEndPoint}`, {
     operationId: 'createSensor',
     security,
+    requestBody: {
+      description: 'Sensor instance to create',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            'x-ts-type': Sensor,
+          },
+        },
+      },
+    },
     responses: {
       '200': {
         description: 'Sensor instance',
@@ -126,10 +143,26 @@ export class SensorController {
     return this.sensorApi.findById(token, sensorId);
   }
 
-  @callback(`/${sensorsApiEndPoint}`, 'put')
+  @callback(
+    'sensorWatcher',
+    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    'patch',
+    {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'patch'},
+  )
   @patch(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'updateSensorById',
     security,
+    requestBody: {
+      description: 'Sensor instance to update',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            'x-ts-type': Sensor,
+          },
+        },
+      },
+    },
     responses: {
       '200': {
         description: 'Sensor instance',
@@ -147,10 +180,26 @@ export class SensorController {
     return this.sensorApi.updateById(token, sensorId, sensor);
   }
 
-  @callback(`/${sensorsApiEndPoint}`, 'put')
+  @callback(
+    'sensorWatcher',
+    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    'put',
+    {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'put'},
+  )
   @put(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'replaceSensorById',
     security,
+    requestBody: {
+      description: 'Sensor instance to update',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            'x-ts-type': Sensor,
+          },
+        },
+      },
+    },
     responses: {
       '200': {
         description: 'Sensor instance',
@@ -168,7 +217,6 @@ export class SensorController {
     return this.sensorApi.replaceById(token, sensorId, sensor);
   }
 
-  @callback(`/${sensorsApiEndPoint}`, 'delete')
   @del(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'deleteSensorById',
     security,

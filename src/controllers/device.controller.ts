@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {inject} from '@loopback/context';
-import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  repository,
+  Where,
+} from '@loopback/repository';
 import {
   post,
   param,
@@ -15,8 +21,14 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
-import {callback} from 'loopback-pubsub-component';
-import {Device, DeviceAuthResponse, DeviceCredential, Measurement, Sensor} from '../models';
+import {callback} from 'loopback-callback-component';
+import {
+  Device,
+  DeviceAuthResponse,
+  DeviceCredential,
+  Measurement,
+  Sensor,
+} from '../models';
 import {DeviceApi, devicesApiEndPoint} from '../services';
 import {defaultResponse, deviceLinks, getToken, sensorLinks} from '../utils';
 
@@ -32,7 +44,6 @@ export class DeviceController {
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
-  @callback(`/${devicesApiEndPoint}`, 'get')
   @cache(30)
   @get(`/${devicesApiEndPoint}`, {
     operationId: 'findDevices',
@@ -61,10 +72,27 @@ export class DeviceController {
     return this.deviceApi.find(token, filter);
   }
 
-  @callback(`/${devicesApiEndPoint}`, 'post')
+  @callback(
+    'deviceWatcher',
+    `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
+    'post',
+    {path: `/${devicesApiEndPoint}`, method: 'post'},
+    // options
+  )
   @post(`/${devicesApiEndPoint}`, {
     operationId: 'createDevice',
     security,
+    requestBody: {
+      description: 'Device instance to create',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            'x-ts-type': Device,
+          },
+        },
+      },
+    },
     responses: {
       '200': {
         description: 'Device instance',
@@ -121,10 +149,27 @@ export class DeviceController {
     return this.deviceApi.findById(token, deviceId);
   }
 
-  @callback(`/${devicesApiEndPoint}`, 'put')
+  @callback(
+    'deviceWatcher',
+    `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
+    'put',
+    {path: `/${devicesApiEndPoint}/{deviceId}`, method: 'put'},
+    // options
+  )
   @put(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'replaceDeviceById',
     security,
+    requestBody: {
+      description: 'Device instance to replace',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            'x-ts-type': Device,
+          },
+        },
+      },
+    },
     responses: {
       '200': {
         description: 'Device instance',
@@ -142,7 +187,6 @@ export class DeviceController {
     return this.deviceApi.replaceById(token, deviceId, device);
   }
 
-  @callback(`/${devicesApiEndPoint}`, 'delete')
   @del(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'deleteDeviceById',
     security,
@@ -151,12 +195,13 @@ export class DeviceController {
     },
     // callbacks
   })
-  async deleteById(@param.path.string('deviceId') deviceId: string): Promise<{id: string}> {
+  async deleteById(
+    @param.path.string('deviceId') deviceId: string,
+  ): Promise<{id: string}> {
     const token = getToken(this.request);
     return this.deviceApi.deleteById(token, deviceId);
   }
 
-  @callback(`/${devicesApiEndPoint}/{deviceId}`, 'get')
   @cache(20)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors`, {
     operationId: 'findDeviceSensors',
@@ -253,7 +298,9 @@ export class DeviceController {
       },
     },
   })
-  async auth(@requestBody() credentials: DeviceCredential): Promise<DeviceAuthResponse> {
+  async auth(
+    @requestBody() credentials: DeviceCredential,
+  ): Promise<DeviceAuthResponse> {
     return this.deviceApi.authenticate(credentials);
   }
 }

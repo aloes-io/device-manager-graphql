@@ -30,12 +30,12 @@ if (require.main === module) {
       //   type: 'http',
       //   scheme: 'bearer',
       // },
-      ApiKey: {
-        type: 'apiKey',
-        description: 'Device / Application API key',
-        in: 'header',
-        name: 'apikey',
-      },
+      // ApiKey: {
+      //   type: 'apiKey',
+      //   description: 'Device / Application API key',
+      //   in: 'header',
+      //   name: 'apikey',
+      // },
       Authorization: {
         type: 'apiKey',
         description: 'User token',
@@ -50,19 +50,21 @@ if (require.main === module) {
       options: {
         keepalive: 60,
         // reschedulePings: true,
-        // protocolId: "MQTT",
+        // protocolId: 'MQTT',
         // protocolVersion: 4,
-        // reconnectPeriod: 1000,
-        // connectTimeout: 30 * 1000,
-        // clean: true,
-        clientId: result.parsed ? result.parsed.ALOES_CLIENT_ID : '',
+        reconnectPeriod: 1000,
+        connectTimeout: 2 * 1000,
+        clean: true,
+        clientId: result.parsed
+          ? `aloes-${result.parsed.ALOES_CLIENT_ID}-graphql`
+          : '',
         username: result.parsed ? result.parsed.ALOES_CLIENT_ID : '',
         password: result.parsed ? result.parsed.ALOES_CLIENT_KEY : '',
       },
     },
   };
 
-  console.error('Starting the application...', config);
+  // console.log('Starting the application...', config);
 
   application.main(config).catch(err => {
     console.error('Cannot start the application.', err);

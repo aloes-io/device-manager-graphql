@@ -11,7 +11,7 @@
     "node": ">=8.9"
   },
   "scripts": {
-    "build": "lb-tsc",
+    "build": "npm run clean && lb-tsc",
     "build:watch": "lb-tsc --watch",
     "clean": "lb-clean dist *.tsbuildinfo",
     "lint": "npm run prettier:check && npm run eslint",
@@ -61,10 +61,11 @@
     "graphql": "^14.5.8",
     "lodash.merge": "^4.6.2",
     "loopback-api-cache": "git+https://git@github.com/getlarge/loopback-api-cache#build",
+    "loopback-callback-component": "^0.2.0",
     "loopback-connector-rest": "^3.6.0",
-    "loopback-pubsub-component": "^0.1.0",
+    "loopback-pubsub-component": "^0.2.1",
     "mqtt": "^3.0.0",
-    "openapi-to-graphql": "^1.7.0",
+    "openapi-to-graphql": "^2.0.0",
     "subscriptions-transport-ws": "^0.9.16"
   },
   "devDependencies": {

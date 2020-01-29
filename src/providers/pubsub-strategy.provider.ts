@@ -1,26 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {inject, Provider, ValueOrPromise} from '@loopback/core';
-import {Request, Response} from '@loopback/rest';
 import {repository} from '@loopback/repository';
 import {
   PubSubBindings,
   PubSubConfig,
   PubSubStrategy,
   PubSubMetadata,
-  CallbackObject,
 } from 'loopback-pubsub-component';
-import {PubSubRepository} from '../repositories';
+import {PubSubEERepository, PubSubMQTTRepository} from '../repositories';
 
 export class PubSubStrategyProvider
   implements Provider<PubSubStrategy | undefined> {
+  private engines: (PubSubEERepository | PubSubMQTTRepository)[];
+
   constructor(
     @inject(PubSubBindings.METADATA) private metadata: PubSubMetadata,
-    @repository(PubSubRepository) protected pubsubRepo: PubSubRepository,
-  ) {}
+    @repository(PubSubEERepository) protected pubsubEERepo: PubSubEERepository,
+    @repository(PubSubMQTTRepository)
+    protected pubsubMQTTRepo: PubSubMQTTRepository,
+  ) {
+    this.engines = [this.pubsubEERepo, this.pubsubMQTTRepo];
+  }
+
+  selectRepository(
+    triggerNames: string | string[],
+  ): PubSubEERepository | PubSubMQTTRepository {
+    // check triggerName or triggerNames[0]
+    // return this.pubsubEERepo || this.pubsubMQTTRepo;
+    return this.engines[0];
+  }
 
   value(): ValueOrPromise<PubSubStrategy | undefined> {
-    // console.log('PUBSUB STRATEGY', this.pubsubRepo);
-
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
@@ -30,28 +40,9 @@ export class PubSubStrategyProvider
         return pubsubConf;
       },
 
-      checkCallback: async (
-        request: Request,
-        response: Response,
-        options?: Object,
-      ) => {
-        // todo : find schema from the request and response
-        console.log('CHECK CALLBACK', this.metadata, request.path);
-        if (!this.metadata) {
-          return Promise.resolve(undefined);
-        }
-        // if (request.path === this.metadata.path) {
-        // }
-
-        const callbackObject: CallbackObject = {
-          path: this.metadata.path,
-          method: this.metadata.method,
-        };
-        return Promise.resolve(callbackObject);
-      },
-
       publish: async (triggerName: string, payload: any) => {
-        await this.pubsubRepo.publish(triggerName, JSON.stringify(payload));
+        const engine = this.selectRepository(triggerName);
+        await engine.publish(triggerName, JSON.stringify(payload));
       },
 
       subscribe: (
@@ -59,20 +50,19 @@ export class PubSubStrategyProvider
         onMessage: (...args: any[]) => void,
         options?: Object,
       ) => {
-        return this.pubsubRepo.subscribe(triggerName, onMessage, options);
+        const engine = this.selectRepository(triggerName);
+        return engine.subscribe(triggerName, onMessage, options);
       },
 
-      unsubscribe: async (subscriptionId: number) => {
-        await this.pubsubRepo.unsubscribe(subscriptionId);
+      unsubscribe: async (triggerName: string) => {
+        const engine = this.selectRepository(triggerName);
+        await engine.unsubscribe(triggerName);
       },
 
       asyncIterator(triggers: string | string[]) {
-        return self.pubsubRepo.asyncIterator(triggers);
+        const engine = self.selectRepository(triggers);
+        return engine.asyncIterator(triggers);
       },
-
-      // asyncIterator<T>(triggers: string | string[]) {
-      //   return new PubSubAsyncIterator<T>(self.pubsubRepo, triggers);
-      // },
     };
   }
 }

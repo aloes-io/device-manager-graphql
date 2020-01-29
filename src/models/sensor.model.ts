@@ -36,12 +36,6 @@ export class Sensor extends Entity {
   })
   resource: number;
 
-  // @property({
-  //   type: 'object',
-  //   required: true,
-  // })
-  // resources: object;
-
   @property({
     type: 'string',
     required: true,
@@ -133,17 +127,23 @@ export class Sensor extends Entity {
   messageProtocolVersion?: string;
 
   @property({
+    type: 'object',
+    required: false,
+  })
+  resources: Resources;
+
+  @property({
     type: 'array',
     required: true,
     itemType: 'string',
   })
   icons: string[];
 
-  // @property({
-  //   type: 'object',
-  //   required: true,
-  // })
-  // colors: object;
+  @property({
+    type: 'object',
+    required: true,
+  })
+  colors: Colors;
 
   @belongsTo(() => User, {keyFrom: 'ownerId', name: 'user'})
   ownerId: string;
@@ -158,6 +158,16 @@ export class Sensor extends Entity {
     super(data);
   }
 }
+
+export type Resources = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
+
+export type Colors = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
 
 export interface SensorRelations {
   // describe navigational properties here
