@@ -27,7 +27,7 @@ export class PubSubEERepository extends PubSubEngine {
 
   public publish(triggerName: string, payload: any): Promise<void> {
     this.ee.emit(triggerName, payload);
-    console.log('PubSubEERepository publish', triggerName, payload);
+    console.log('PubSubEERepository publish', triggerName);
     return Promise.resolve();
   }
 

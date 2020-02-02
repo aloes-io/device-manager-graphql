@@ -72,13 +72,13 @@ export class DeviceController {
     return this.deviceApi.find(token, filter);
   }
 
-  @callback(
-    'deviceWatcher',
-    `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
-    'post',
-    {path: `/${devicesApiEndPoint}`, method: 'post'},
-    // options
-  )
+  // @callback(
+  //   'deviceWatcher',
+  //   `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
+  //   'post',
+  //   {path: `/${devicesApiEndPoint}`, method: 'post'},
+  //   // options
+  // )
   @post(`/${devicesApiEndPoint}`, {
     operationId: 'createDevice',
     security,
@@ -149,13 +149,13 @@ export class DeviceController {
     return this.deviceApi.findById(token, deviceId);
   }
 
-  @callback(
-    'deviceWatcher',
-    `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
-    'put',
-    {path: `/${devicesApiEndPoint}/{deviceId}`, method: 'put'},
-    // options
-  )
+  // @callback(
+  //   'deviceWatcher',
+  //   `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
+  //   'put',
+  //   {path: `/${devicesApiEndPoint}/{deviceId}`, method: 'put'},
+  //   // options
+  // )
   @put(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'replaceDeviceById',
     security,
@@ -253,37 +253,6 @@ export class DeviceController {
     const token = getToken(this.request);
     return this.deviceApi.findSensorsCount(token, deviceId, where);
   }
-
-  // @cache(20)
-  // @get(`/${devicesApiEndPoint}/findByOwner/{ownerId}`, {
-  //   operationId: 'findDevicesByOwnerId',
-  //   security,
-  //   responses: {
-  //     '200': {
-  //       description: 'Device collection',
-  //       content: {
-  //         'application/json': {
-  //           schema: {
-  //             type: 'array',
-  //             items: {'x-ts-type': Device},
-  //           },
-  //         },
-  //       },
-  //       links,
-  //     },
-  //     default: defaultResponse,
-  //   },
-  // })
-  // async findByOwnerId(
-  //   @param.path.string('ownerId') ownerId: string,
-  //   @param.query.object('filter', getFilterSchemaFor(Device)) filter?: Filter<Device>,
-  //   @param.query.object('sensorFilter', getFilterSchemaFor(Sensor)) sensorFilter?: Filter<Sensor>,
-  // ): Promise<Device[]> {
-  //   const token = getToken(this.request);
-  //   const whereFilter = {where: {ownerId}};
-  //   // console.log('findDevicesByOwnerId whereFilter', filter, whereFilter);
-  //   return this.deviceApi.find(token, filter ? merge(filter, whereFilter) : whereFilter);
-  // }
 
   @post(`/${devicesApiEndPoint}/authenticate`, {
     operationId: 'deviceAuthenticate',

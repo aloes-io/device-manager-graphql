@@ -6,7 +6,6 @@ import {
 } from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
-// import {HttpServer} from '@loopback/http-server';
 import {ServiceMixin} from '@loopback/service-proxy';
 import {CacheBindings, CacheComponent} from 'loopback-api-cache';
 import {CallbackBindings, CallbackComponent} from 'loopback-callback-component';
@@ -15,8 +14,6 @@ import {EventEmitter} from 'events';
 import {connect} from 'mqtt';
 import path from 'path';
 import merge from 'lodash.merge';
-
-// import {WebSocketServer} from './websocket.server';
 import {
   CacheStrategyProvider,
   CallbackStrategyProvider,
@@ -27,9 +24,6 @@ import {MySequence} from './sequence';
 export class DeviceManagerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
-  // readonly httpServer: HttpServer;
-  // readonly wsServer: WebSocketServer;
-
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
@@ -73,18 +67,7 @@ export class DeviceManagerApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
 
-    // Create ws server from the http server
-    // const wsServer = new WebSocketServer(this.httpServer);
-    // this.bind('servers.websocket.server1').to(wsServer);
-    // wsServer.use((socket, next) => {
-    //   console.log('Global middleware - socket:', socket.id);
-    //   next();
-    // });
-    // // Add a route
-    // this.wsServer = wsServer;
-
     this.projectRoot = __dirname;
-    // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
       controllers: {
         // Customize ControllerBooter Conventions here
@@ -94,12 +77,4 @@ export class DeviceManagerApplication extends BootMixin(
       },
     };
   }
-
-  // start() {
-  //   return this.wsServer.start();
-  // }
-
-  // stop() {
-  //   return this.wsServer.stop();
-  // }
 }

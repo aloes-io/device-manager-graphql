@@ -70,7 +70,7 @@ export class SensorController {
 
   @callback(
     'sensorWatcher',
-    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
     'post',
     {path: `/${sensorsApiEndPoint}`, method: 'post'},
   )
@@ -145,7 +145,7 @@ export class SensorController {
 
   @callback(
     'sensorWatcher',
-    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
     'patch',
     {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'patch'},
   )
@@ -182,7 +182,7 @@ export class SensorController {
 
   @callback(
     'sensorWatcher',
-    `/api/{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+    `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
     'put',
     {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'put'},
   )

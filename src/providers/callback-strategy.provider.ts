@@ -90,8 +90,15 @@ export class CallbackStrategyProvider
           });
           topic = value;
         }
+
         // topic = `${process.env.ALOES_CLIENT_ID}/tx/${topic}`
-        const payload = resolvePayload(cbName, result, 'string');
+        let payload;
+        try {
+          payload = resolvePayload(cbName, result, 'object');
+        } catch (e) {
+          payload = resolvePayload(cbName, result, 'string');
+        }
+        // const payload = resolvePayload(cbName, result, 'object');
         // console.log('resolved callback', topic, payload);
         return {topic, payload};
       },

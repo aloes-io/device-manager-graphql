@@ -9,8 +9,6 @@ if (result.error) {
 module.exports = application;
 
 if (require.main === module) {
-  // Run the application
-
   const config = {
     rest: {
       port: +(result.parsed ? result.parsed.SERVER_PORT : 3000),
@@ -56,10 +54,10 @@ if (require.main === module) {
         connectTimeout: 2 * 1000,
         clean: true,
         clientId: result.parsed
-          ? `aloes-${result.parsed.ALOES_CLIENT_ID}-graphql`
+          ? `aloes-${result.parsed.ALOES_ID}-graphql`
           : '',
-        username: result.parsed ? result.parsed.ALOES_CLIENT_ID : '',
-        password: result.parsed ? result.parsed.ALOES_CLIENT_KEY : '',
+        username: result.parsed ? result.parsed.ALOES_ID : '',
+        password: result.parsed ? result.parsed.ALOES_KEY : '',
       },
     },
   };

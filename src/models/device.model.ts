@@ -37,9 +37,9 @@ export class Device extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  clientKey: string;
+  clientKey?: string;
 
   @property({
     type: 'string',

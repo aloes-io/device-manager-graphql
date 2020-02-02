@@ -107,7 +107,7 @@ export class PubSubMQTTRepository extends PubSubEngine {
           JSON.stringify(payload),
           this.parseMessageWithEncoding,
         );
-        console.log('PubSubMQTTRepository publish', triggerName, payload);
+        console.log('PubSubMQTTRepository publish', triggerName);
         this.client.publish(triggerName, message, publishOptions);
       },
     );

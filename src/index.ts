@@ -1,104 +1,35 @@
 import {ApplicationConfig} from '@loopback/core';
 import {inject} from '@loopback/context';
-import graphqlHTTP from 'express-graphql';
-import {printSchema} from 'graphql';
-import {createGraphQLSchema} from 'openapi-to-graphql';
-import {Oas3} from 'openapi-to-graphql/lib/types/oas3';
-// import {execute, subscribe} from 'graphql';
-// import {SubscriptionServer} from 'subscriptions-transport-ws';
-
-import {removeFile, writeFile} from './utils';
 import {DeviceManagerApplication} from './application';
+import {PubSubEERepository, PubSubMQTTRepository} from './repositories';
+import {AloesBridge} from './aloes-bridge';
+import {GraphQlBridge} from './graphql-bridge';
 
 export {DeviceManagerApplication};
 
-async function mountGraphQl(app: DeviceManagerApplication) {
-  const graphQlPath = '/graphql';
-  const oas: Oas3 = <Oas3>app.restServer.getApiSpec();
-
-  const {schema, report} = await createGraphQLSchema(oas, {
-    strict: false,
-    viewer: true,
-    fillEmptyResponses: true,
-    operationIdFieldNames: true,
-    baseUrl: app.restServer.url,
-    headers: {
-      'X-Origin': 'GraphQL',
-    },
-    // tokenJSONpath: '$.jwt',
-    // customResolvers: {
-    //   'LoopBack Application': {
-    //     '/users/{userId}': {
-    //       get: (obj, args, ctx, info) => {
-    //         console.log('users/{userId}', obj, args, ctx);
-    //       },
-    //     },
-    //   },
-    // },
-  });
-
-  console.log('GRAPHQL REPORT : ', report);
-  const rootPath = `${__dirname}/..`;
-  const openApiPath = `${rootPath}/openapi.json`;
-  const graphQlSchemaPath = `${rootPath}/openapi.graphql`;
-  await removeFile(openApiPath);
-  await removeFile(graphQlSchemaPath);
-  await writeFile(openApiPath, JSON.stringify(oas, null, 2));
-  await writeFile(graphQlSchemaPath, printSchema(schema));
-
-  const handler: graphqlHTTP.Middleware = graphqlHTTP(
-    (request, response, graphQLParams) => ({
-      schema,
-      pretty: true,
-      graphiql: true,
-      // graphiql: process.env.NODE_ENV === 'development',
-      // context: {jwt: getJwt(request)},
-    }),
-  );
-
-  // Get the jwt from the Authorization header and place in context.jwt, which is then referenced in tokenJSONpath
-  // function getJwt(req: any) {
-  //   console.log('getJWT', req.headers);
-  //   if (req.headers && req.headers.authorization) {
-  //     return req.headers.authorization;
-  //     // return req.headers.authorization.replace(/^Bearer /, '');
-  //   }
-  // }
-
-  // Waiting for changes in openapi-graphql to be merged to implement this :
-  // const server = await app.getServer(app.RestServer);
-  // or
-  // const server = app.wsServer;
-  // const pubsub = await app.getRepository(PubSubRepository);
-
-  // new SubscriptionServer(
-  //   {
-  //     execute,
-  //     subscribe,
-  //     schema,
-  //     onConnect: (params: any, socket: any, ctx: any) => {
-  //       // adding pubsub to subscribe context
-  //       return { pubsub }
-  //     }
-  //   },
-  //   {
-  //     server,
-  //     path: '/subscriptions'
-  //   }
-  // )
-
-  app.mountExpressRouter(graphQlPath, handler);
-}
-
 export async function main(options: ApplicationConfig = {}) {
   const app = new DeviceManagerApplication(options);
-  await app.boot();
-  await app.start();
+  try {
+    await app.boot();
+    await app.start();
 
-  const url: string = <string>app.restServer.url;
-  console.log(`Server is running at ${url}`);
+    const url: string = <string>app.restServer.url;
+    console.log(`Server is running at ${url}`);
 
-  await mountGraphQl(app);
+    const pubsubEERepository = await app.getRepository(PubSubEERepository);
+    const pubsubMQTTRepository = await app.getRepository(PubSubMQTTRepository);
 
-  return app;
+    const graphQlBridge = new GraphQlBridge(app, pubsubEERepository);
+    await graphQlBridge.start();
+
+    const aloesBridge = new AloesBridge(
+      pubsubEERepository,
+      pubsubMQTTRepository,
+    );
+    await aloesBridge.start();
+
+    return app;
+  } catch (e) {
+    return app;
+  }
 }
