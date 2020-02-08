@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {inject} from '@loopback/context';
 import {repository} from '@loopback/repository';
+
+import {HttpServer} from '@loopback/http-server';
+import {RestServer} from '@loopback/rest';
+
 import graphqlHTTP from 'express-graphql';
 import {printSchema} from 'graphql';
 import {createGraphQLSchema} from 'openapi-to-graphql';
@@ -12,6 +16,7 @@ import {PubSubEERepository} from './repositories';
 import {removeFile, writeFile} from './utils';
 
 export class GraphQlBridge {
+  readonly httpServer: HttpServer;
   private app: DeviceManagerApplication;
   public endpoints: string[] = ['/graphql', '/subscriptions'];
 
@@ -35,15 +40,6 @@ export class GraphQlBridge {
           'X-Origin': 'GraphQL',
         },
         // tokenJSONpath: '$.jwt',
-        // customResolvers: {
-        //   'LoopBack Application': {
-        //     '/users/{userId}': {
-        //       get: (obj, args, ctx, info) => {
-        //         console.log('users/{userId}', obj, args, ctx);
-        //       },
-        //     },
-        //   },
-        // },
       });
 
       console.log('GRAPHQL REPORT : ', report);
@@ -67,8 +63,7 @@ export class GraphQlBridge {
         (request, response, graphQLParams) => ({
           schema,
           pretty: true,
-          graphiql: true,
-          // graphiql: process.env.NODE_ENV === 'development',
+          graphiql: process.env.NODE_ENV !== 'production',
           // context: {jwt: getJwt(request)},
         }),
       );
@@ -83,7 +78,8 @@ export class GraphQlBridge {
       // }
       this.app.mountExpressRouter(this.endpoints[0], handler);
 
-      const server = await this.app.getServer(this.app.RestServer);
+      const server = await this.app.getServer(RestServer);
+      // const server = await this.app.getServer(this.app.RestServer);
 
       new SubscriptionServer(
         {

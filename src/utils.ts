@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {Request} from '@loopback/rest';
 import * as fs from 'fs';
-import {GeneralError} from './models';
+import {Device, DeviceTopic, GeneralError, Sensor, SensorTopic} from './models';
+import {devicesApiEndPoint, sensorsApiEndPoint} from './services';
+
+export const security = [
+  {
+    Authorization: [],
+  },
+];
 
 export const defaultResponse = {
   description: 'Default http response',
@@ -57,46 +64,54 @@ export const deviceLinks = {
   },
 };
 
-export const deviceEvents = {
-  DevicesEvent: {
-    '/api/{$request.body#/userName}/devices/{$request.body#/method}/+': {
-      post: {
-        operationId: 'devicesEventListener',
-        description: 'Listen all devices events owned by userName',
-        requestBody: {
-          description: 'Device instance to update / create',
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Device',
-              },
-            },
-          },
-        },
-        responses: {
-          '200': {
-            description: 'Device instance',
-            content: {
-              'application/json': {
-                schema: {
-                  $ref: '#/components/schemas/Device',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-};
-
 export const sensorLinks = {
   measurements: {
     operationId: 'findSensorMeasurements',
     parameters: {
       sensorId: '$response.body#/id',
       filter: '$request.query.measurementFilter',
+    },
+  },
+};
+
+const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/+`;
+
+export const deviceCallbacks = {
+  [deviceCallbackExpression]: {
+    post: {
+      operationId: 'devicesEventListener',
+      description: 'Listen all devices events owned by ownerId',
+      requestBody: {
+        required: true,
+        content: {'application/json': {schema: {'x-ts-type': DeviceTopic}}},
+      },
+      responses: {
+        '200': {
+          description: 'Device instance',
+          content: {'application/json': {schema: {'x-ts-type': Device}}},
+        },
+      },
+    },
+  },
+};
+
+const sensorCallbackExpression = `{$request.body#/ownerId}/${sensorsApiEndPoint}/{$method}/+`;
+
+export const sensorCallbacks = {
+  [sensorCallbackExpression]: {
+    post: {
+      operationId: 'sensorsEventListener',
+      description: 'Listen all sensors events owned by ownerId',
+      requestBody: {
+        required: true,
+        content: {'application/json': {schema: {'x-ts-type': SensorTopic}}},
+      },
+      responses: {
+        '200': {
+          description: 'Sensor instance',
+          content: {'application/json': {schema: {'x-ts-type': Sensor}}},
+        },
+      },
     },
   },
 };

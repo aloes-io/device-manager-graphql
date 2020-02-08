@@ -25,13 +25,13 @@ import {cache} from 'loopback-api-cache';
 import {callback} from 'loopback-callback-component';
 import {Measurement, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
-import {defaultResponse, getToken, sensorLinks} from '../utils';
-
-const security = [
-  {
-    Authorization: [],
-  },
-];
+import {
+  defaultResponse,
+  getToken,
+  sensorLinks,
+  sensorCallbacks,
+  security,
+} from '../utils';
 
 export class SensorController {
   constructor(
@@ -95,6 +95,7 @@ export class SensorController {
       },
       default: defaultResponse,
     },
+    callbacks: {sensorCallbacks},
   })
   async create(@requestBody() device: Sensor): Promise<Sensor> {
     const token = getToken(this.request);
@@ -221,6 +222,22 @@ export class SensorController {
     operationId: 'deleteSensorById',
     security,
     responses: {
+      '200': {
+        description: 'Count of instance deleted',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                count: {
+                  type: 'number',
+                  description: 'Number of instance deleted',
+                },
+              },
+            },
+          },
+        },
+      },
       default: defaultResponse,
     },
   })

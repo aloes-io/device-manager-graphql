@@ -13,7 +13,11 @@ if (require.main === module) {
     rest: {
       port: +(result.parsed ? result.parsed.SERVER_PORT : 3000),
       host: result.parsed ? result.parsed.SERVER_HOST : 'localhost',
-      gracePeriodForClose: 5000, // 5 seconds
+      gracePeriodForClose: 5000,
+      expressSettings: {
+        'x-powered-by': false,
+        // env: 'production',
+      },
       openApiSpec: {
         // useful when used with OpenAPI-to-GraphQL to locate your application
         setServersFromRequest: true,

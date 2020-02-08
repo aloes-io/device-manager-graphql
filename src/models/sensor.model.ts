@@ -174,3 +174,28 @@ export interface SensorRelations {
 }
 
 export type SensorWithRelations = Sensor & SensorRelations;
+
+@model({settings: {}})
+export class SensorTopic extends Entity {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  method: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  ownerId: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  sensorId?: string;
+
+  constructor(data?: Partial<SensorTopic>) {
+    super(data);
+  }
+}

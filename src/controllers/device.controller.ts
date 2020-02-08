@@ -21,22 +21,23 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
-import {callback} from 'loopback-callback-component';
 import {
   Device,
+  DeviceTopic,
   DeviceAuthResponse,
   DeviceCredential,
   Measurement,
   Sensor,
 } from '../models';
 import {DeviceApi, devicesApiEndPoint} from '../services';
-import {defaultResponse, deviceLinks, getToken, sensorLinks} from '../utils';
-
-const security = [
-  {
-    Authorization: [],
-  },
-];
+import {
+  defaultResponse,
+  deviceLinks,
+  deviceCallbacks,
+  getToken,
+  sensorLinks,
+  security,
+} from '../utils';
 
 export class DeviceController {
   constructor(
@@ -72,13 +73,6 @@ export class DeviceController {
     return this.deviceApi.find(token, filter);
   }
 
-  // @callback(
-  //   'deviceWatcher',
-  //   `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
-  //   'post',
-  //   {path: `/${devicesApiEndPoint}`, method: 'post'},
-  //   // options
-  // )
   @post(`/${devicesApiEndPoint}`, {
     operationId: 'createDevice',
     security,
@@ -100,7 +94,9 @@ export class DeviceController {
       },
       default: defaultResponse,
     },
-    // callbacks
+    callbacks: {
+      deviceCallbacks,
+    },
   })
   async create(@requestBody() device: Device): Promise<Device> {
     const token = getToken(this.request);
@@ -149,13 +145,6 @@ export class DeviceController {
     return this.deviceApi.findById(token, deviceId);
   }
 
-  // @callback(
-  //   'deviceWatcher',
-  //   `/api/{$response.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$response.body#/id}`,
-  //   'put',
-  //   {path: `/${devicesApiEndPoint}/{deviceId}`, method: 'put'},
-  //   // options
-  // )
   @put(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'replaceDeviceById',
     security,
@@ -177,7 +166,7 @@ export class DeviceController {
       },
       default: defaultResponse,
     },
-    // callbacks
+    // callbacks: deviceCallbacks,
   })
   async replaceById(
     @param.path.string('deviceId') deviceId: string,
@@ -191,6 +180,22 @@ export class DeviceController {
     operationId: 'deleteDeviceById',
     security,
     responses: {
+      '200': {
+        description: 'Count of instance deleted',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                count: {
+                  type: 'number',
+                  description: 'Number of instance deleted',
+                },
+              },
+            },
+          },
+        },
+      },
       default: defaultResponse,
     },
     // callbacks

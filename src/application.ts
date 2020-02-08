@@ -68,6 +68,7 @@ export class DeviceManagerApplication extends BootMixin(
     this.component(RestExplorerComponent);
 
     this.projectRoot = __dirname;
+
     this.bootOptions = {
       controllers: {
         // Customize ControllerBooter Conventions here

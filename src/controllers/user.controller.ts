@@ -37,13 +37,8 @@ import {
   getToken,
   userLinks,
   sensorLinks,
+  security,
 } from '../utils';
-
-const security = [
-  {
-    Authorization: [],
-  },
-];
 
 export class UserController {
   constructor(
@@ -135,7 +130,6 @@ export class UserController {
     measurementFilter?: Filter<Measurement>,
   ): Promise<User> {
     const token = getToken(this.request);
-    console.log('HEADERS', this.request.headers);
     return this.userApi.findById(token, userId);
   }
 

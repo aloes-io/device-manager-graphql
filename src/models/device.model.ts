@@ -164,3 +164,28 @@ export class DeviceCredential extends Entity {
     super(data);
   }
 }
+
+@model({settings: {}})
+export class DeviceTopic extends Entity {
+  @property({
+    type: 'string',
+    required: true,
+  })
+  method: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  ownerId: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  deviceId?: string;
+
+  constructor(data?: Partial<DeviceTopic>) {
+    super(data);
+  }
+}
