@@ -7,4 +7,5 @@ export * from './omaObject.model';
 export * from './omaResource.model';
 export * from './omaView.model';
 export * from './sensor.model';
+export * from './sensorResource.model';
 export * from './user.model';

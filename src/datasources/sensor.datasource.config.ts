@@ -56,6 +56,18 @@ const sensorDefinition = {
     },
     {
       template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{sensorId}`,
+        headers: {
+          authorization: '{token}',
+        },
+      },
+      functions: {
+        findById: ['token', 'sensorId'],
+      },
+    },
+    {
+      template: {
         method: 'POST',
         url: `${baseURL}/${endPoint}`,
         headers: {
@@ -65,18 +77,6 @@ const sensorDefinition = {
       },
       functions: {
         create: ['token', 'sensor'],
-      },
-    },
-    {
-      template: {
-        method: 'GET',
-        url: `${baseURL}/${endPoint}/{sensorId}`,
-        headers: {
-          authorization: '{token}',
-        },
-      },
-      functions: {
-        findById: ['token', 'sensorId'],
       },
     },
     {
@@ -130,6 +130,45 @@ const sensorDefinition = {
       },
       functions: {
         findMeasurements: ['token', 'sensorId', 'filter'],
+      },
+    },
+    {
+      template: {
+        method: 'GET',
+        url: `${baseURL}/${endPoint}/{sensorId}/resources`,
+        headers: {
+          authorization: '{token}',
+        },
+      },
+      functions: {
+        findResources: ['token', 'sensorId'],
+      },
+    },
+    {
+      template: {
+        method: 'PUT',
+        url: `${baseURL}/${endPoint}/{sensorId}/resources`,
+        headers: {
+          authorization: '{token}',
+        },
+        body: {
+          resources: '{resources}',
+        },
+      },
+      functions: {
+        replaceResources: ['token', 'sensorId', 'resources'],
+      },
+    },
+    {
+      template: {
+        method: 'DELETE',
+        url: `${baseURL}/${endPoint}/{sensorId}/resources`,
+        headers: {
+          authorization: '{token}',
+        },
+      },
+      functions: {
+        deleteResources: ['token', 'sensorId'],
       },
     },
   ],

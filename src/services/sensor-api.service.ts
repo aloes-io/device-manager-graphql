@@ -2,7 +2,7 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {Count, Filter, Where} from '@loopback/repository';
 import {SensorDataSource} from '../datasources';
-import {Measurement, Sensor} from '../models';
+import {Measurement, Sensor, SensorResource} from '../models';
 
 export const sensorsApiBaseUrl = SensorDataSource.baseURL;
 export const sensorsApiEndPoint = SensorDataSource.endPoint;
@@ -14,12 +14,6 @@ export interface SensorApi {
 
   findById(token: string, sensorId: string): Promise<Sensor>;
 
-  findMeasurements(
-    token: string,
-    sensorId: string,
-    filter?: Filter<Measurement>,
-  ): Promise<Measurement[]>;
-
   create(token: string, sensor: Sensor): Promise<Sensor>;
 
   replaceById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
@@ -27,6 +21,22 @@ export interface SensorApi {
   updateById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
 
   deleteById(token: string, sensorId: string): Promise<{id: string}>;
+
+  findMeasurements(
+    token: string,
+    sensorId: string,
+    filter?: Filter<Measurement>,
+  ): Promise<Measurement[]>;
+
+  findResources(token: string, sensorId: string): Promise<SensorResource>;
+
+  updateResources(
+    token: string,
+    sensorId: string,
+    resources: SensorResource,
+  ): Promise<SensorResource>;
+
+  deleteResources(token: string, sensorId: string): Promise<Boolean>;
 }
 
 export class SensorApiProvider implements Provider<SensorApi> {

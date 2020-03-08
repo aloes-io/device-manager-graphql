@@ -1,13 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/context';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
   post,
   param,
@@ -23,7 +16,7 @@ import {
 } from '@loopback/rest';
 import {cache} from 'loopback-api-cache';
 import {callback} from 'loopback-callback-component';
-import {Measurement, Sensor} from '../models';
+import {Measurement, SensorResource, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
 import {
   defaultResponse,
@@ -281,10 +274,33 @@ export class SensorController {
       );
       return measurements;
     } catch (e) {
-      console.log('FIND MEASUREMENTS: ERR', e);
       return null;
     }
     // return this.sensorApi.findMeasurements(token, sensorId, filter);
   }
+
+  @cache(10)
+  @get(`/${sensorsApiEndPoint}/{sensorId}/resources`, {
+    operationId: 'findSensorResources',
+    security,
+    responses: {
+      '200': {
+        description: 'SensorResource collection',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': SensorResource,
+            },
+          },
+        },
+      },
+      default: defaultResponse,
+    },
+  })
+  async findResources(
+    @param.path.string('sensorId') sensorId: string,
+  ): Promise<SensorResource | null> {
+    const token = getToken(this.request);
+    return this.sensorApi.findResources(token, sensorId);
+  }
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */
