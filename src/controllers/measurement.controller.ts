@@ -1,27 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import {inject} from '@loopback/context';
+import {Filter} from '@loopback/repository';
 import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
   param,
   get,
   getFilterSchemaFor,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
   Request,
-  requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {cache} from 'loopback-api-cache';
+import {cache} from 'loopback-api-component';
 import {Measurement} from '../models';
 import {MeasurementApi, measurementsApiEndPoint} from '../services';
 import {defaultResponse, getToken} from '../utils';
@@ -91,4 +77,3 @@ export class MeasurementController {
     return this.measurementApi.findById(token, measurementId);
   }
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */

@@ -8,9 +8,10 @@ import {
   PubSubAsyncIterator,
 } from 'loopback-pubsub-component';
 import {EventEmitter} from 'events';
+import {EventEmitter2} from 'eventEmitter2';
 
 export class PubSubEERepository extends PubSubEngine {
-  protected ee: EventEmitter;
+  protected ee: EventEmitter | EventEmitter2;
   public subscriptions: {[subId: number]: [string, (...args: any[]) => void]};
   public subIdCounter: number;
 

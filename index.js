@@ -11,8 +11,8 @@ module.exports = application;
 if (require.main === module) {
   const config = {
     rest: {
-      port: +(result.parsed ? result.parsed.SERVER_PORT : 3000),
-      host: result.parsed ? result.parsed.SERVER_HOST : 'localhost',
+      port: +(result.parsed.HTTP_SERVER_PORT || 3001),
+      host: result.parsed.HTTP_SERVER_HOST || 'localhost',
       gracePeriodForClose: 5000,
       expressSettings: {
         'x-powered-by': false,
@@ -26,6 +26,7 @@ if (require.main === module) {
         //     '/openapi.yaml': { version: '3.0.0', format: 'yaml' },
         //   },
       },
+      schemaPath: `${__dirname}/openapi.json`,
     },
     securitySchemes: {
       // BearerAuth: {
@@ -45,10 +46,26 @@ if (require.main === module) {
         name: 'authorization',
       },
     },
+    ws: {
+      port: +(result.parsed.WS_SERVER_PORT || 3002),
+      host: result.parsed.WS_SERVER_HOST || 'localhost',
+    },
+    graphql: {
+      path: '/graphql',
+      strict: false,
+      viewer: true,
+      fillEmptyResponses: true,
+      operationIdFieldNames: true,
+      headers: {
+        'X-Origin': 'GraphQL',
+      },
+      schemaPath: `${__dirname}/openapi.graphql`,
+      graphiql: result.parsed.NODE_ENV !== 'production',
+    },
     mqtt: {
-      url: result.parsed
-        ? `${result.parsed.ALOES_BROKER_SCHEME}://${result.parsed.ALOES_BROKER_ROOT}`
-        : 'ws://localhost:3000',
+      url: `${result.parsed.ALOES_BROKER_SCHEME || 'ws'}://${result.parsed
+        .ALOES_BROKER_ROOT || 'localhost:3000'}`,
+      subPrefix: `aloes-${result.parsed.ALOES_ID || 0}/+/tx/+`,
       options: {
         keepalive: 60,
         // reschedulePings: true,
@@ -57,11 +74,9 @@ if (require.main === module) {
         reconnectPeriod: 1000,
         connectTimeout: 2 * 1000,
         clean: true,
-        clientId: result.parsed
-          ? `aloes-${result.parsed.ALOES_ID}-graphql`
-          : '',
-        username: result.parsed ? result.parsed.ALOES_ID : '',
-        password: result.parsed ? result.parsed.ALOES_KEY : '',
+        clientId: `aloes-${result.parsed.ALOES_ID || 0}-graphql`,
+        username: result.parsed.ALOES_ID || '',
+        password: result.parsed.ALOES_KEY || '',
       },
     },
   };

@@ -57,6 +57,7 @@
     "@loopback/rest-explorer": "^2.0.0",
     "@loopback/service-proxy": "^2.0.0",
     "dotenv": "^8.2.0",
+    "eventemitter2": "^6.0.0",
     "express-graphql": "^0.9.0",
     "graphql": "^14.5.8",
     "lodash.merge": "^4.6.2",

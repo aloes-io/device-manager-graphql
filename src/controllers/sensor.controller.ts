@@ -14,17 +14,11 @@ import {
   requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {cache} from 'loopback-api-cache';
+import {cache} from 'loopback-api-component';
 import {callback} from 'loopback-callback-component';
 import {Measurement, SensorResource, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
-import {
-  defaultResponse,
-  getToken,
-  sensorLinks,
-  sensorCallbacks,
-  security,
-} from '../utils';
+import {defaultResponse, getToken, sensorLinks, security} from '../utils';
 
 export class SensorController {
   constructor(
@@ -88,7 +82,11 @@ export class SensorController {
       },
       default: defaultResponse,
     },
-    callbacks: {sensorCallbacks},
+    callbacks: {
+      sensorChange: {
+        $ref: '#/components/callbacks/SensorEvents',
+      },
+    },
   })
   async create(@requestBody() device: Sensor): Promise<Sensor> {
     const token = getToken(this.request);
@@ -137,12 +135,12 @@ export class SensorController {
     return this.sensorApi.findById(token, sensorId);
   }
 
-  @callback(
-    'sensorWatcher',
-    `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
-    'patch',
-    {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'patch'},
-  )
+  // @callback(
+  //   'sensorWatcher',
+  //   `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+  //   'patch',
+  //   {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'patch'},
+  // )
   @patch(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'updateSensorById',
     security,
@@ -164,7 +162,11 @@ export class SensorController {
       },
       default: defaultResponse,
     },
-    // callbacks
+    callbacks: {
+      sensorChange: {
+        $ref: '#/components/callbacks/SensorEvents',
+      },
+    },
   })
   async updateById(
     @param.path.string('sensorId') sensorId: string,
@@ -174,12 +176,12 @@ export class SensorController {
     return this.sensorApi.updateById(token, sensorId, sensor);
   }
 
-  @callback(
-    'sensorWatcher',
-    `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
-    'put',
-    {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'put'},
-  )
+  // @callback(
+  //   'sensorWatcher',
+  //   `{$response.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$response.body#/id}`,
+  //   'put',
+  //   {path: `/${sensorsApiEndPoint}/{sensorId}`, method: 'put'},
+  // )
   @put(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'replaceSensorById',
     security,
@@ -201,7 +203,12 @@ export class SensorController {
       },
       default: defaultResponse,
     },
-    // callbacks
+    callbacks: {
+      sensorChange: {
+        $ref: '#/components/callbacks/SensorEvents',
+      },
+      // sensorCallbacks,
+    },
   })
   async replaceById(
     @param.path.string('sensorId') sensorId: string,

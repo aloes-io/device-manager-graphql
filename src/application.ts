@@ -1,5 +1,6 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
+// import {getControllerSpec} from '@loopback/openapi-v3';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -7,10 +8,11 @@ import {
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import {CacheBindings, CacheComponent} from 'loopback-api-cache';
+import {CacheBindings, CacheComponent} from 'loopback-api-component';
 import {CallbackBindings, CallbackComponent} from 'loopback-callback-component';
 import {PubSubBindings, PubSubComponent} from 'loopback-pubsub-component';
-import {EventEmitter} from 'events';
+// import {EventEmitter} from 'events';
+import {EventEmitter2} from 'eventEmitter2';
 import {connect} from 'mqtt';
 import path from 'path';
 import merge from 'lodash.merge';
@@ -20,6 +22,7 @@ import {
   PubSubStrategyProvider,
 } from './providers';
 import {MySequence} from './sequence';
+import {deviceCallbacks, sensorCallbacks} from './utils';
 
 export class DeviceManagerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -30,8 +33,15 @@ export class DeviceManagerApplication extends BootMixin(
     const mqttClient = connect(options.mqtt.url, {
       ...options.mqtt.options,
     });
+
     this.bind(PubSubBindings.CONFIG).to({
-      eventEmitter: new EventEmitter(),
+      // eventEmitter: new EventEmitter(),
+      eventEmitter: new EventEmitter2({
+        wildcard: true,
+        delimiter: '/',
+        maxListeners: 20,
+        verboseMemoryLeak: false,
+      }),
       client: mqttClient,
     });
     this.component(PubSubComponent);
@@ -51,15 +61,28 @@ export class DeviceManagerApplication extends BootMixin(
 
     this.static('/', path.join(__dirname, '../public'));
 
-    // Setup security schemes available for endpoints
+    // Setup security schemes and callbacks available for endpoints
     const spec = this.getSync(RestBindings.API_SPEC);
     merge(spec, {
       components: {
         securitySchemes: {
           ...options.securitySchemes,
         },
+        callbacks: {
+          SensorEvents: {
+            ...sensorCallbacks,
+          },
+          DeviceEvents: {
+            ...deviceCallbacks,
+          },
+        },
       },
     });
+
+    // console.log(
+    //   'DeviceControllerSpec',
+    //   JSON.stringify(spec.components, null, 2),
+    // );
 
     // Customize @loopback/rest-explorer configuration here
     this.bind(RestExplorerBindings.CONFIG).to({

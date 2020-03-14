@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Request} from '@loopback/rest';
+import {getModelSchemaRef} from '@loopback/openapi-v3';
+// import {Request} from '@loopback/rest';
 import * as fs from 'fs';
-import {Device, DeviceTopic, GeneralError, Sensor, SensorTopic} from './models';
+import {DeviceTopic, GeneralError, SensorTopic} from './models';
 import {devicesApiEndPoint, sensorsApiEndPoint} from './services';
 
 export const security = [
@@ -15,6 +16,7 @@ export const defaultResponse = {
   content: {
     'application/json': {
       schema: {'x-ts-type': GeneralError},
+      // schema: {$ref: '#/components/schemas/GeneralError'},
     },
   },
 };
@@ -74,7 +76,8 @@ export const sensorLinks = {
   },
 };
 
-const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/+`;
+const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/*`;
+// const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$request.body#/deviceId}`;
 
 export const deviceCallbacks = {
   [deviceCallbackExpression]: {
@@ -83,19 +86,32 @@ export const deviceCallbacks = {
       description: 'Listen all devices events owned by ownerId',
       requestBody: {
         required: true,
-        content: {'application/json': {schema: {'x-ts-type': DeviceTopic}}},
+        content: {
+          'application/json': {
+            schema: {
+              ...getModelSchemaRef(DeviceTopic).definitions.DeviceTopic,
+            },
+          },
+        },
       },
       responses: {
         '200': {
           description: 'Device instance',
-          content: {'application/json': {schema: {'x-ts-type': Device}}},
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Device',
+              },
+            },
+          },
         },
       },
     },
   },
 };
 
-const sensorCallbackExpression = `{$request.body#/ownerId}/${sensorsApiEndPoint}/{$method}/+`;
+const sensorCallbackExpression = `{$request.body#/ownerId}/${sensorsApiEndPoint}/{$method}/*`;
+// const sensorCallbackExpression = `{$request.body#/ownerId}/${sensorsApiEndPoint}/{$method}/{$request.body#/sensorId}`;
 
 export const sensorCallbacks = {
   [sensorCallbackExpression]: {
@@ -104,20 +120,36 @@ export const sensorCallbacks = {
       description: 'Listen all sensors events owned by ownerId',
       requestBody: {
         required: true,
-        content: {'application/json': {schema: {'x-ts-type': SensorTopic}}},
+        content: {
+          'application/json': {
+            schema: {
+              ...getModelSchemaRef(SensorTopic).definitions.SensorTopic,
+            },
+          },
+        },
       },
       responses: {
         '200': {
           description: 'Sensor instance',
-          content: {'application/json': {schema: {'x-ts-type': Sensor}}},
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Sensor',
+                // 'x-ts-type': Sensor
+              },
+            },
+          },
         },
       },
     },
   },
 };
 
-export const getToken = (req: Request): string => {
-  return req.headers.authorization ? req.headers.authorization : '';
+// export const getToken = (req: Request): string => {
+export const getToken = (req: any): string => {
+  return req.headers && req.headers.authorization
+    ? req.headers.authorization
+    : '';
 };
 
 export const readFile = (filePath: string, opts = 'utf8') =>

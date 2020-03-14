@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {inject} from '@loopback/context';
+import {ApplicationConfig} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {Device, Sensor} from './models';
 import {PubSubEERepository, PubSubMQTTRepository} from './repositories';
@@ -8,64 +8,79 @@ import {devicesApiEndPoint, sensorsApiEndPoint} from './services';
 type Subscription = {
   topic: string;
   onMessage: (...args: any[]) => void;
-  // onMessage: Function;
+  // onMessage: (payload: Device | Sensor) => void;
+};
+
+type Packet = {
+  topic: string;
+  payload: Device | Sensor;
 };
 
 export class AloesBridge {
-  private endPoint = `aloes-${process.env.ALOES_ID}/+/tx/+`;
+  private endPoint: string;
   private subscriptions: Subscription[];
 
   constructor(
+    options: ApplicationConfig = {},
     @repository(PubSubEERepository) protected pubsubEERepo: PubSubEERepository,
     @repository(PubSubMQTTRepository)
     protected pubsubMQTTRepo: PubSubMQTTRepository,
   ) {
+    this.endPoint = options.mqtt.subPrefix;
     this.subscriptions = this.createSubscriptions();
+  }
+
+  buildTopic(payload: Device | Sensor, endpoint: string, method: string) {
+    return `${payload.ownerId}/${endpoint}/${method.toUpperCase()}/${
+      payload.id
+    }`;
   }
 
   createSubscriptions(): Subscription[] {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
-    function bridge(topic: string, payload: Device | Sensor) {
+    function bridge(packet: Packet) {
+      const {topic, payload} = packet;
       self.pubsubEERepo.publish(topic, payload).catch(e => e);
+      // console.log('aloesBridge:', topic);
     }
 
     const subscriptions = [
       {
         topic: `${this.endPoint}/Device/POST/#`,
         onMessage: (payload: Device) => {
-          bridge(
-            `${payload.ownerId}/${devicesApiEndPoint}/post/${payload.id}`,
+          bridge({
+            topic: this.buildTopic(payload, devicesApiEndPoint, 'POST'),
             payload,
-          );
+          });
         },
       },
       {
         topic: `${this.endPoint}/Device/PUT/#`,
         onMessage: (payload: Device) => {
-          bridge(
-            `${payload.ownerId}/${devicesApiEndPoint}/put/${payload.id}`,
+          bridge({
+            topic: this.buildTopic(payload, devicesApiEndPoint, 'PUT'),
             payload,
-          );
+          });
         },
       },
       {
         topic: `${this.endPoint}/Sensor/POST/#`,
         onMessage: (payload: Sensor) => {
-          bridge(
-            `${payload.ownerId}/${sensorsApiEndPoint}/post/${payload.id}`,
+          bridge({
+            topic: this.buildTopic(payload, sensorsApiEndPoint, 'POST'),
             payload,
-          );
+          });
         },
       },
       {
         topic: `${this.endPoint}/Sensor/PUT/#`,
         onMessage: (payload: Sensor) => {
-          bridge(
-            `${payload.ownerId}/${sensorsApiEndPoint}/put/${payload.id}`,
+          bridge({
+            topic: this.buildTopic(payload, sensorsApiEndPoint, 'PUT'),
             payload,
-          );
+          });
         },
       },
     ];

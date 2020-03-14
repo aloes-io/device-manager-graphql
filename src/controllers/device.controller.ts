@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {inject} from '@loopback/context';
+import {getModelSchemaRef} from '@loopback/openapi-v3';
+import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
+  api,
   post,
   param,
   get,
@@ -20,10 +16,10 @@ import {
   requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {cache} from 'loopback-api-cache';
+import {cache} from 'loopback-api-component';
+// import {api as deviceApi} from './device.controller.api';
 import {
   Device,
-  DeviceTopic,
   DeviceAuthResponse,
   DeviceCredential,
   Measurement,
@@ -33,12 +29,12 @@ import {DeviceApi, devicesApiEndPoint} from '../services';
 import {
   defaultResponse,
   deviceLinks,
-  deviceCallbacks,
   getToken,
   sensorLinks,
   security,
 } from '../utils';
 
+// @api(deviceApi)
 export class DeviceController {
   constructor(
     @inject('services.DeviceApi') protected deviceApi: DeviceApi,
@@ -82,6 +78,7 @@ export class DeviceController {
       content: {
         'application/json': {
           schema: {
+            // $ref: '#/components/schemas/Device',
             'x-ts-type': Device,
           },
         },
@@ -90,12 +87,22 @@ export class DeviceController {
     responses: {
       '200': {
         description: 'Device instance',
-        content: {'application/json': {schema: {'x-ts-type': Device}}},
+        content: {
+          'application/json': {
+            schema: {
+              // $ref: '#/components/schemas/Device',
+              'x-ts-type': Device,
+            },
+          },
+        },
       },
       default: defaultResponse,
     },
     callbacks: {
-      deviceCallbacks,
+      deviceChange: {
+        $ref: '#/components/callbacks/DeviceEvents',
+      },
+      // deviceCallbacks,
     },
   })
   async create(@requestBody() device: Device): Promise<Device> {
@@ -130,7 +137,14 @@ export class DeviceController {
     responses: {
       '200': {
         description: 'Device instance',
-        content: {'application/json': {schema: {'x-ts-type': Device}}},
+        content: {
+          'application/json': {
+            schema: {
+              // $ref: '#/components/schemas/Device'
+              'x-ts-type': Device,
+            },
+          },
+        },
         links: deviceLinks,
       },
       default: defaultResponse,
@@ -148,25 +162,27 @@ export class DeviceController {
   @put(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'replaceDeviceById',
     security,
-    requestBody: {
-      description: 'Device instance to replace',
-      required: true,
-      content: {
-        'application/json': {
-          schema: {
-            'x-ts-type': Device,
-          },
-        },
-      },
-    },
     responses: {
       '200': {
         description: 'Device instance',
-        content: {'application/json': {schema: {'x-ts-type': Device}}},
+        content: {
+          'application/json': {
+            schema: {
+              // $ref: '#/components/schemas/Device'
+              'x-ts-type': Device,
+            },
+          },
+        },
+        links: deviceLinks,
       },
       default: defaultResponse,
     },
-    // callbacks: deviceCallbacks,
+    callbacks: {
+      deviceChange: {
+        $ref: '#/components/callbacks/DeviceEvents',
+      },
+      // deviceCallbacks,
+    },
   })
   async replaceById(
     @param.path.string('deviceId') deviceId: string,
@@ -179,6 +195,14 @@ export class DeviceController {
   @del(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'deleteDeviceById',
     security,
+    parameters: [
+      {
+        name: 'deviceId',
+        in: 'path',
+        required: true,
+        schema: {type: 'string'},
+      },
+    ],
     responses: {
       '200': {
         description: 'Count of instance deleted',
@@ -198,7 +222,6 @@ export class DeviceController {
       },
       default: defaultResponse,
     },
-    // callbacks
   })
   async deleteById(
     @param.path.string('deviceId') deviceId: string,
@@ -218,7 +241,10 @@ export class DeviceController {
           'application/json': {
             schema: {
               type: 'array',
-              items: {'x-ts-type': Sensor},
+              items: {
+                // $ref: '#/components/schemas/Sensor',
+                'x-ts-type': Sensor,
+              },
             },
           },
         },

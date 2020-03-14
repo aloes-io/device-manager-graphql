@@ -1,5 +1,4 @@
 import {ApplicationConfig} from '@loopback/core';
-import {inject} from '@loopback/context';
 import {DeviceManagerApplication} from './application';
 import {PubSubEERepository, PubSubMQTTRepository} from './repositories';
 import {AloesBridge} from './aloes-bridge';
@@ -9,27 +8,24 @@ export {DeviceManagerApplication};
 
 export async function main(options: ApplicationConfig = {}) {
   const app = new DeviceManagerApplication(options);
-  try {
-    await app.boot();
-    await app.start();
+  await app.boot();
+  await app.start();
 
-    const url: string = <string>app.restServer.url;
-    console.log(`Server is running at ${url}`);
+  const url: string = app.restServer.url as string;
+  console.log(`Server is running at ${url}`);
 
-    const pubsubEERepository = await app.getRepository(PubSubEERepository);
-    const pubsubMQTTRepository = await app.getRepository(PubSubMQTTRepository);
+  const pubsubEERepository = await app.getRepository(PubSubEERepository);
+  const pubsubMQTTRepository = await app.getRepository(PubSubMQTTRepository);
 
-    const graphQlBridge = new GraphQlBridge(app, pubsubEERepository);
-    await graphQlBridge.start();
+  app.graphQlBridge = new GraphQlBridge(app, options, pubsubEERepository);
+  await app.graphQlBridge.start();
 
-    const aloesBridge = new AloesBridge(
-      pubsubEERepository,
-      pubsubMQTTRepository,
-    );
-    await aloesBridge.start();
+  app.aloesBridge = new AloesBridge(
+    options,
+    pubsubEERepository,
+    pubsubMQTTRepository,
+  );
+  await app.aloesBridge.start();
 
-    return app;
-  } catch (e) {
-    return app;
-  }
+  // return app;
 }
