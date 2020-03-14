@@ -21,7 +21,7 @@ import {
   requestBody,
   RestBindings,
 } from '@loopback/rest';
-import {cache} from 'loopback-api-cache';
+import {cache} from 'loopback-api-component';
 import {
   AccessToken,
   Device,

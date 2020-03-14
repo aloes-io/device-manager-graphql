@@ -2,7 +2,11 @@
 import {inject, Provider, ValueOrPromise} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {Request} from '@loopback/rest';
-import {CacheBindings, CacheMetadata, CacheStrategy} from 'loopback-api-cache';
+import {
+  CacheBindings,
+  CacheMetadata,
+  CacheStrategy,
+} from 'loopback-api-component';
 import {Cache} from '../models';
 import {CacheRepository} from '../repositories';
 

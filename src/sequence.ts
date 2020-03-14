@@ -9,7 +9,7 @@ import {
   Send,
   SequenceHandler,
 } from '@loopback/rest';
-import {CacheBindings, CacheCheckFn, CacheSetFn} from 'loopback-api-cache';
+import {CacheBindings, CacheCheckFn, CacheSetFn} from 'loopback-api-component';
 import {PubSubBindings, PubSubPublishFn} from 'loopback-pubsub-component';
 import {
   CallbackBindings,

@@ -24,7 +24,19 @@ export interface PubSubMQTTOptions extends PubSubConfig {
   subscribeOptions?: SubscribeOptionsResolver;
   onMQTTSubscribe?: (id: number, granted: ISubscriptionGrant[]) => void;
   triggerTransform?: TriggerTransform;
-  parseMessageWithEncoding?: string;
+  // parseMessageWithEncoding?: string;
+  parseMessageWithEncoding?:
+    | 'ascii'
+    | 'utf8'
+    | 'utf-8'
+    | 'utf16le'
+    | 'ucs2'
+    | 'ucs-2'
+    | 'base64'
+    | 'latin1'
+    | 'binary'
+    | 'hex'
+    | undefined;
 }
 
 export class PubSubMQTTRepository extends PubSubEngine {
@@ -38,7 +50,19 @@ export class PubSubMQTTRepository extends PubSubEngine {
   private onMQTTSubscribe: SubscribeHandler;
   private subscribeOptionsResolver: SubscribeOptionsResolver;
   private publishOptionsResolver: PublishOptionsResolver;
-  private parseMessageWithEncoding?: string;
+  // private parseMessageWithEncoding?: string;
+  private parseMessageWithEncoding?:
+    | 'ascii'
+    | 'utf8'
+    | 'utf-8'
+    | 'utf16le'
+    | 'ucs2'
+    | 'ucs-2'
+    | 'base64'
+    | 'latin1'
+    | 'binary'
+    | 'hex'
+    | undefined;
 
   private static matches(pattern: string, topic: string) {
     const patternSegments = pattern.split('/');
@@ -103,10 +127,8 @@ export class PubSubMQTTRepository extends PubSubEngine {
   public publish(triggerName: string, payload: any): Promise<void> {
     return this.publishOptionsResolver(triggerName, payload).then(
       publishOptions => {
-        const message = Buffer.from(
-          JSON.stringify(payload),
-          this.parseMessageWithEncoding,
-        );
+        payload = JSON.stringify(payload);
+        const message = Buffer.from(payload, this.parseMessageWithEncoding);
         console.log('PubSubMQTTRepository publish', triggerName);
         this.client.publish(triggerName, message, publishOptions);
       },
