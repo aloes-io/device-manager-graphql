@@ -1,22 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {inject} from '@loopback/context';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
   post,
   param,
   get,
   getFilterSchemaFor,
   getWhereSchemaFor,
-  patch,
   put,
-  del,
   Request,
   requestBody,
   RestBindings,

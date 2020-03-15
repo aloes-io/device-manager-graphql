@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from 'axios';
 import {ApplicationConfig} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import graphqlHTTP from 'express-graphql';
@@ -10,6 +11,7 @@ import {SubscriptionServer} from 'subscriptions-transport-ws';
 import {DeviceManagerApplication} from './application';
 import {PubSubEERepository} from './repositories';
 import {removeFile, writeFile} from './utils';
+// import {Socket} from 'dgram';
 
 type GraphQLBridgeOptions = {
   openAPISchemaPath: string;
@@ -17,6 +19,28 @@ type GraphQLBridgeOptions = {
   endpoint: string;
   headers?: {[key: string]: string};
   graphiql: boolean;
+};
+
+type WSCredentials = {
+  username: string;
+  password: string;
+  client?: Object;
+};
+
+const authentificationRequest = async (body: WSCredentials) => {
+  const baseUrl = `${process.env.ALOES_SERVER_SCHEME}://${process.env.ALOES_SERVER_HOST}${process.env.ALOES_SERVER_API_ROOT}`;
+  const {data} = await axios.post(`${baseUrl}/authenticate`, body, {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'aloes-id': process.env.ALOES_ID,
+      'aloes-key': process.env.ALOES_KEY,
+    },
+  });
+  if (data) {
+    return data;
+  }
+  return null;
 };
 
 export class GraphQlBridge {
@@ -29,7 +53,7 @@ export class GraphQlBridge {
   constructor(
     app: DeviceManagerApplication,
     options: ApplicationConfig,
-    @repository(PubSubEERepository) protected pubsub: PubSubEERepository,
+    @repository(PubSubEERepository) protected pubsub: PubSubEERepository, // @inject('services.UserApi') protected userApi: UserApi,
   ) {
     this.app = app;
     this.bridgeOptions = {
@@ -43,7 +67,7 @@ export class GraphQlBridge {
       console.log(' this.httpServer listener', req.headers);
     }).listen(options.ws.port, options.ws.host, () => {
       console.log(
-        `Websocket Server is now running on ws://${options.ws.host}:${options.ws.port}`,
+        `WS Server is running @ ws://${options.ws.host}:${options.ws.port}`,
       );
     });
   }
@@ -62,9 +86,7 @@ export class GraphQlBridge {
       });
 
       console.log('GRAPHQL REPORT : ', report);
-      // const rootPath = `${__dirname}/..`;
-      // const openApiPath = `${rootPath}/openapi.json`;
-      // const graphQlSchemaPath = `${rootPath}/openapi.graphql`;
+
       await removeFile(this.bridgeOptions.openAPISchemaPath);
       await removeFile(this.bridgeOptions.graphQLSchemaPath);
       await writeFile(
@@ -101,17 +123,42 @@ export class GraphQlBridge {
     //   }
     // }
     this.app.mountExpressRouter(this.bridgeOptions.endpoint, handler);
-    // const server = await this.app.getServer(RestServer);
 
     this.subscriptionServer = new SubscriptionServer(
       {
         execute,
         subscribe,
         schema,
-        onConnect: (params: any, socket: any, ctx: any) => {
-          // control headers ?
-          console.log('GRAPHQL WS onConnect', params);
+        onConnect: async (params: Object, socket: any, ctx: any) => {
+          // consider creating a new pubsub client with params ?
+          const credentials: WSCredentials = params as WSCredentials;
+          const {username, password} = credentials;
+          if (!username || !password) {
+            throw new Error('Please provide valid credentials in WS params');
+          }
+          // console.log(socket._socket.remoteAddress, ctx.request.connection.remoteAddress);
+          const client = {
+            ip: socket._socket.remoteAddress,
+            id: `${username}-${Math.random()
+              .toString(16)
+              .substr(2, 8)}`,
+          };
+
+          const body = {client, username, password};
+          console.log('GRAPHQL WS onConnect', body);
+          const {status} = await authentificationRequest(body);
+          if (status !== 0) {
+            throw new Error('Invalid credentials');
+          }
           return {pubsub: this.pubsub};
+        },
+        // onOperation: (message: any, params: any, webSocket: WebSocket) => {
+        //   console.log('GRAPHQL WS onOperation', {message});
+        //   return {};
+        // },
+        onDisconnect: (socket: WebSocket, ctx: any) => {
+          // delete created client with params, if any
+          console.log('GRAPHQL WS onDisconnect');
         },
       },
       {

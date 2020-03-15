@@ -43,7 +43,6 @@ export class AloesBridge {
     function bridge(packet: Packet) {
       const {topic, payload} = packet;
       self.pubsubEERepo.publish(topic, payload).catch(e => e);
-      // console.log('aloesBridge:', topic);
     }
 
     const subscriptions = [

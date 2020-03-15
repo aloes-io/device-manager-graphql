@@ -12,7 +12,7 @@ export async function main(options: ApplicationConfig = {}) {
   await app.start();
 
   const url: string = app.restServer.url as string;
-  console.log(`Server is running at ${url}`);
+  console.log(`HTTP Server is running at ${url}`);
 
   const pubsubEERepository = await app.getRepository(PubSubEERepository);
   const pubsubMQTTRepository = await app.getRepository(PubSubMQTTRepository);

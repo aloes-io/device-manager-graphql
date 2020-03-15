@@ -11,7 +11,6 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import {CacheBindings, CacheComponent} from 'loopback-api-component';
 import {CallbackBindings, CallbackComponent} from 'loopback-callback-component';
 import {PubSubBindings, PubSubComponent} from 'loopback-pubsub-component';
-// import {EventEmitter} from 'events';
 import {EventEmitter2} from 'eventEmitter2';
 import {connect} from 'mqtt';
 import path from 'path';
@@ -34,14 +33,15 @@ export class DeviceManagerApplication extends BootMixin(
       ...options.mqtt.options,
     });
 
+    const eeServer = new EventEmitter2({
+      wildcard: true,
+      delimiter: '/',
+      maxListeners: 20,
+      verboseMemoryLeak: false,
+    });
+
     this.bind(PubSubBindings.CONFIG).to({
-      // eventEmitter: new EventEmitter(),
-      eventEmitter: new EventEmitter2({
-        wildcard: true,
-        delimiter: '/',
-        maxListeners: 20,
-        verboseMemoryLeak: false,
-      }),
+      eventEmitter: eeServer,
       client: mqttClient,
     });
     this.component(PubSubComponent);
