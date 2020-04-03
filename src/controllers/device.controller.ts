@@ -78,7 +78,6 @@ export class DeviceController {
       content: {
         'application/json': {
           schema: {
-            // $ref: '#/components/schemas/Device',
             'x-ts-type': Device,
           },
         },
@@ -90,7 +89,6 @@ export class DeviceController {
         content: {
           'application/json': {
             schema: {
-              // $ref: '#/components/schemas/Device',
               'x-ts-type': Device,
             },
           },
@@ -102,7 +100,6 @@ export class DeviceController {
       deviceChange: {
         $ref: '#/components/callbacks/DeviceEvents',
       },
-      // deviceCallbacks,
     },
   })
   async create(@requestBody() device: Device): Promise<Device> {
@@ -140,7 +137,6 @@ export class DeviceController {
         content: {
           'application/json': {
             schema: {
-              // $ref: '#/components/schemas/Device'
               'x-ts-type': Device,
             },
           },
@@ -168,7 +164,6 @@ export class DeviceController {
         content: {
           'application/json': {
             schema: {
-              // $ref: '#/components/schemas/Device'
               'x-ts-type': Device,
             },
           },
@@ -181,7 +176,6 @@ export class DeviceController {
       deviceChange: {
         $ref: '#/components/callbacks/DeviceEvents',
       },
-      // deviceCallbacks,
     },
   })
   async replaceById(
@@ -242,7 +236,6 @@ export class DeviceController {
             schema: {
               type: 'array',
               items: {
-                // $ref: '#/components/schemas/Sensor',
                 'x-ts-type': Sensor,
               },
             },

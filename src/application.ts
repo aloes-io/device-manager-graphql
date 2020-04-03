@@ -1,6 +1,5 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-// import {getControllerSpec} from '@loopback/openapi-v3';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -78,11 +77,6 @@ export class DeviceManagerApplication extends BootMixin(
         },
       },
     });
-
-    // console.log(
-    //   'DeviceControllerSpec',
-    //   JSON.stringify(spec.components, null, 2),
-    // );
 
     // Customize @loopback/rest-explorer configuration here
     this.bind(RestExplorerBindings.CONFIG).to({

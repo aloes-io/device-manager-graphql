@@ -207,7 +207,6 @@ export class SensorController {
       sensorChange: {
         $ref: '#/components/callbacks/SensorEvents',
       },
-      // sensorCallbacks,
     },
   })
   async replaceById(

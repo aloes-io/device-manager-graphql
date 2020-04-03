@@ -28,7 +28,8 @@ type WSCredentials = {
 };
 
 const authentificationRequest = async (body: WSCredentials) => {
-  const baseUrl = `${process.env.ALOES_SERVER_SCHEME}://${process.env.ALOES_SERVER_HOST}${process.env.ALOES_SERVER_API_ROOT}`;
+  // const baseUrl = `${process.env.ALOES_SERVER_SCHEME}://${process.env.ALOES_SERVER_HOST}${process.env.ALOES_SERVER_API_ROOT}`;
+  const baseUrl = `${process.env.ALOES_SERVER_URL}${process.env.ALOES_SERVER_API_ROOT}`;
   const {data} = await axios.post(`${baseUrl}/authenticate`, body, {
     headers: {
       accept: 'application/json',
@@ -53,7 +54,7 @@ export class GraphQlBridge {
   constructor(
     app: DeviceManagerApplication,
     options: ApplicationConfig,
-    @repository(PubSubEERepository) protected pubsub: PubSubEERepository, // @inject('services.UserApi') protected userApi: UserApi,
+    @repository(PubSubEERepository) protected pubsub: PubSubEERepository,
   ) {
     this.app = app;
     this.bridgeOptions = {

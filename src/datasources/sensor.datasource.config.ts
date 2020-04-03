@@ -1,14 +1,6 @@
-import dotenv from 'dotenv';
-
-const result = dotenv.config();
-// if (result.error) {
-//   throw result.error
-// }
-
-const host = result.parsed ? result.parsed.ALOES_SERVER_HOST : 'localhost:8000';
-const scheme = result.parsed ? result.parsed.ALOES_SERVER_SCHEME : 'http';
-const basePath = result.parsed ? result.parsed.ALOES_SERVER_API_ROOT : '/api';
-export const baseURL = `${scheme}://${host}${basePath}`;
+const basePath = process.env.ALOES_SERVER_API_ROOT ?? '/api';
+const baseUrl = process.env.ALOES_SERVER_URL ?? 'http://localhost:8000';
+export const baseURL = `${baseUrl}${basePath}`;
 export const endPoint = 'Sensors';
 
 const sensorDefinition = {

@@ -1,5 +1,5 @@
-const application = require('./dist');
 const dotenv = require('dotenv');
+const application = require('./dist');
 
 const result = dotenv.config();
 if (result.error) {
@@ -51,7 +51,7 @@ if (require.main === module) {
       host: result.parsed.WS_SERVER_HOST || 'localhost',
     },
     graphql: {
-      path: '/graphql',
+      path: result.parsed.GRAPHQL_PATH || '/graphql',
       strict: false,
       viewer: true,
       fillEmptyResponses: true,
@@ -63,8 +63,7 @@ if (require.main === module) {
       graphiql: result.parsed.NODE_ENV !== 'production',
     },
     mqtt: {
-      url: `${result.parsed.ALOES_BROKER_SCHEME || 'ws'}://${result.parsed
-        .ALOES_BROKER_ROOT || 'localhost:3000'}`,
+      url: `${result.parsed.ALOES_BROKER_URL || 'ws://localhost:3000'}`,
       subPrefix: `aloes-${result.parsed.ALOES_ID || 0}/+/tx/+`,
       options: {
         keepalive: 60,

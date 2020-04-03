@@ -42,7 +42,6 @@ export interface PubSubMQTTOptions extends PubSubConfig {
 export class PubSubMQTTRepository extends PubSubEngine {
   protected client: Client;
   public subscriptions: {[subId: number]: [string, (...args: any[]) => void]};
-  // private subscriptionMap: {[subId: number]: [string, Function]};
   private subsRefsMap: {[trigger: string]: Array<number>};
   public subIdCounter: number;
   private currentSubscriptionId: number;
@@ -129,7 +128,7 @@ export class PubSubMQTTRepository extends PubSubEngine {
       publishOptions => {
         payload = JSON.stringify(payload);
         const message = Buffer.from(payload, this.parseMessageWithEncoding);
-        console.log('PubSubMQTTRepository publish', triggerName);
+        // console.log('PubSubMQTTRepository publish', triggerName);
         this.client.publish(triggerName, message, publishOptions);
       },
     );
@@ -142,7 +141,7 @@ export class PubSubMQTTRepository extends PubSubEngine {
     options?: Object,
   ): Promise<number> {
     const triggerName: string = this.triggerTransform(trigger, options);
-    console.log('PubSubMQTTRepository subscribe', triggerName);
+    // console.log('PubSubMQTTRepository subscribe', triggerName);
 
     const id = this.currentSubscriptionId++;
     this.subscriptions[id] = [triggerName, onMessage];
@@ -152,29 +151,28 @@ export class PubSubMQTTRepository extends PubSubEngine {
       const newRefs = [...refs, id];
       this.subsRefsMap[triggerName] = newRefs;
       return Promise.resolve(id);
-    } else {
-      return new Promise<number>((resolve, reject) => {
-        this.subscribeOptionsResolver(trigger, options)
-          .then(subscriptionOptions => {
-            this.client.subscribe(
-              triggerName,
-              {qos: 0, ...subscriptionOptions},
-              (err, granted) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  const subscriptionIds = this.subsRefsMap[triggerName] || [];
-                  this.subsRefsMap[triggerName] = [...subscriptionIds, id];
-                  resolve(id);
-
-                  this.onMQTTSubscribe(id, granted);
-                }
-              },
-            );
-          })
-          .catch(err => reject(err));
-      });
     }
+    return new Promise<number>((resolve, reject) => {
+      this.subscribeOptionsResolver(trigger, options)
+        .then(subscriptionOptions => {
+          this.client.subscribe(
+            triggerName,
+            {qos: 0, ...subscriptionOptions},
+            (err, granted) => {
+              if (err) {
+                reject(err);
+              } else {
+                const subscriptionIds = this.subsRefsMap[triggerName] || [];
+                this.subsRefsMap[triggerName] = [...subscriptionIds, id];
+                resolve(id);
+
+                this.onMQTTSubscribe(id, granted);
+              }
+            },
+          );
+        })
+        .catch(err => reject(err));
+    });
   }
 
   public unsubscribe(subIdOrTriggerName: number | string) {
@@ -275,14 +273,17 @@ export type TriggerTransform = (
   trigger: Trigger,
   channelOptions?: Object,
 ) => string;
+
 export type SubscribeOptionsResolver = (
   trigger: Trigger,
   channelOptions?: Object,
 ) => Promise<IClientSubscribeOptions>;
+
 export type PublishOptionsResolver = (
   trigger: Trigger,
   payload: any,
 ) => Promise<IClientPublishOptions>;
+
 export type SubscribeHandler = (
   id: number,
   granted: ISubscriptionGrant[],
