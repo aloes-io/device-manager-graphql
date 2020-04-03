@@ -81,6 +81,7 @@ export class GraphQlBridge {
         viewer: true,
         fillEmptyResponses: true,
         operationIdFieldNames: true,
+        createSubscriptionsFromCallbacks: true,
         baseUrl: this.app.restServer.url,
         headers: this.bridgeOptions.headers,
         // tokenJSONpath: '$.jwt',

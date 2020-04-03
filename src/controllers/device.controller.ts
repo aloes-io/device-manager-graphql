@@ -3,13 +3,12 @@ import {inject} from '@loopback/context';
 import {getModelSchemaRef} from '@loopback/openapi-v3';
 import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
-  api,
+  // api,
   post,
   param,
   get,
   getFilterSchemaFor,
   getWhereSchemaFor,
-  patch,
   put,
   del,
   Request,

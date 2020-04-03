@@ -19,6 +19,7 @@ type Packet = {
 export class AloesBridge {
   private endPoint: string;
   private subscriptions: Subscription[];
+  private methods = ['HEAD', 'POST', 'PUT', 'DELETE'];
 
   constructor(
     options: ApplicationConfig = {},
@@ -45,44 +46,27 @@ export class AloesBridge {
       self.pubsubEERepo.publish(topic, payload).catch(e => e);
     }
 
-    const subscriptions = [
-      {
-        topic: `${this.endPoint}/Device/POST/#`,
-        onMessage: (payload: Device) => {
-          bridge({
-            topic: this.buildTopic(payload, devicesApiEndPoint, 'POST'),
-            payload,
-          });
-        },
+    const sensorSubscriptions = this.methods.map(method => ({
+      topic: `${this.endPoint}/Sensor/${method}/#`,
+      onMessage: (payload: Sensor) => {
+        bridge({
+          topic: this.buildTopic(payload, sensorsApiEndPoint, method),
+          payload,
+        });
       },
-      {
-        topic: `${this.endPoint}/Device/PUT/#`,
-        onMessage: (payload: Device) => {
-          bridge({
-            topic: this.buildTopic(payload, devicesApiEndPoint, 'PUT'),
-            payload,
-          });
-        },
+    }));
+
+    const deviceSubscriptions = this.methods.map(method => ({
+      topic: `${this.endPoint}/Device/${method}/#`,
+      onMessage: (payload: Device) => {
+        bridge({
+          topic: this.buildTopic(payload, devicesApiEndPoint, method),
+          payload,
+        });
       },
-      {
-        topic: `${this.endPoint}/Sensor/POST/#`,
-        onMessage: (payload: Sensor) => {
-          bridge({
-            topic: this.buildTopic(payload, sensorsApiEndPoint, 'POST'),
-            payload,
-          });
-        },
-      },
-      {
-        topic: `${this.endPoint}/Sensor/PUT/#`,
-        onMessage: (payload: Sensor) => {
-          bridge({
-            topic: this.buildTopic(payload, sensorsApiEndPoint, 'PUT'),
-            payload,
-          });
-        },
-      },
-    ];
+    }));
+
+    const subscriptions = [...sensorSubscriptions, ...deviceSubscriptions];
 
     return subscriptions;
   }

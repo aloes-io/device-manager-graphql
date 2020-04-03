@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const basePath = process.env.ALOES_SERVER_API_ROOT ?? '/api';
 const baseUrl = process.env.ALOES_SERVER_URL ?? 'http://localhost:8000';
 export const baseURL = `${baseUrl}${basePath}`;
