@@ -28,7 +28,7 @@ export class PubSubEERepository extends PubSubEngine {
 
   public publish(triggerName: string, payload: any): Promise<void> {
     this.ee.emit(triggerName, payload);
-    // console.log('PubSubEERepository publish', triggerName);
+    console.log('PubSubEERepository publish', triggerName);
     return Promise.resolve();
   }
 
@@ -37,7 +37,7 @@ export class PubSubEERepository extends PubSubEngine {
     onMessage: (...args: any[]) => void,
     options?: Object,
   ): Promise<number> {
-    // console.log('PubSubEERepository subscribe', triggerName);
+    console.log('PubSubEERepository subscribe', triggerName);
     this.ee.addListener(triggerName, onMessage);
     this.subIdCounter = this.subIdCounter + 1;
     this.subscriptions[this.subIdCounter] = [triggerName, onMessage];
@@ -45,7 +45,7 @@ export class PubSubEERepository extends PubSubEngine {
   }
 
   public unsubscribe(subIdOrTriggerName: number | string) {
-    // console.log('PubSubEERepository unsubscribe', subIdOrTriggerName);
+    console.log('PubSubEERepository unsubscribe', subIdOrTriggerName);
     if (typeof subIdOrTriggerName === 'string') {
       return this.unsubscribeByName(subIdOrTriggerName);
     }

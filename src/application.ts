@@ -61,6 +61,7 @@ export class DeviceManagerApplication extends BootMixin(
     this.static('/', path.join(__dirname, '../public'));
 
     // Setup security schemes and callbacks available for endpoints
+    // make callbacks function taking pubsub type as argument
     const spec = this.getSync(RestBindings.API_SPEC);
     merge(spec, {
       components: {

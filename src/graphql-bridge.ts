@@ -28,7 +28,6 @@ type WSCredentials = {
 };
 
 const authentificationRequest = async (body: WSCredentials) => {
-  // const baseUrl = `${process.env.ALOES_SERVER_SCHEME}://${process.env.ALOES_SERVER_HOST}${process.env.ALOES_SERVER_API_ROOT}`;
   const baseUrl = `${process.env.ALOES_SERVER_URL}${process.env.ALOES_SERVER_API_ROOT}`;
   const {data} = await axios.post(`${baseUrl}/authenticate`, body, {
     headers: {
@@ -64,13 +63,15 @@ export class GraphQlBridge {
       graphiql: options.graphql.graphiql,
     };
 
-    this.httpServer = createServer((req, res) => {
-      console.log(' this.httpServer listener', req.headers);
-    }).listen(options.ws.port, options.ws.host, () => {
-      console.log(
-        `WS Server is running @ ws://${options.ws.host}:${options.ws.port}`,
-      );
-    });
+    this.httpServer = createServer().listen(
+      options.ws.port,
+      options.ws.host,
+      () => {
+        console.log(
+          `WS Server is running @ ws://${options.ws.host}:${options.ws.port}`,
+        );
+      },
+    );
   }
 
   async createSchema(): Promise<GraphQLSchema | null> {

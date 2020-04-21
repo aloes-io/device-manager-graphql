@@ -223,7 +223,7 @@ export class DeviceController {
     return this.deviceApi.deleteById(token, deviceId);
   }
 
-  @cache(20)
+  @cache(10)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors`, {
     operationId: 'findDeviceSensors',
     security,
@@ -256,7 +256,7 @@ export class DeviceController {
     return this.deviceApi.findSensors(token, deviceId, filter);
   }
 
-  @cache(20)
+  @cache(10)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors/count`, {
     operationId: 'findDeviceSensorsCount',
     security,

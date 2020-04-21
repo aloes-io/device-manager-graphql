@@ -1,13 +1,8 @@
-import {
-  belongsTo,
-  Entity,
-  hasMany,
-  model,
-  property,
-} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {Device} from './device.model';
 import {Measurement} from './measurement.model';
 import {User} from './user.model';
+// import {SensorResource} from './sensorResource.model';
 
 @model({settings: {}})
 export class Sensor extends Entity {
@@ -127,12 +122,6 @@ export class Sensor extends Entity {
   messageProtocolVersion?: string;
 
   @property({
-    type: 'object',
-    required: false,
-  })
-  resources: Resources;
-
-  @property({
     type: 'array',
     required: true,
     itemType: 'string',
@@ -154,15 +143,13 @@ export class Sensor extends Entity {
   @hasMany(() => Measurement)
   measurements?: Measurement[];
 
+  // @hasOne(() => SensorResource)
+  // resources?: SensorResource;
+
   constructor(data?: Partial<Sensor>) {
     super(data);
   }
 }
-
-export type Resources = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-};
 
 export type Colors = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

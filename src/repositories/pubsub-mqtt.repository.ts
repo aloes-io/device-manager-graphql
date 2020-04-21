@@ -128,7 +128,7 @@ export class PubSubMQTTRepository extends PubSubEngine {
       publishOptions => {
         payload = JSON.stringify(payload);
         const message = Buffer.from(payload, this.parseMessageWithEncoding);
-        // console.log('PubSubMQTTRepository publish', triggerName);
+        console.log('PubSubMQTTRepository publish', triggerName);
         this.client.publish(triggerName, message, publishOptions);
       },
     );
@@ -141,7 +141,7 @@ export class PubSubMQTTRepository extends PubSubEngine {
     options?: Object,
   ): Promise<number> {
     const triggerName: string = this.triggerTransform(trigger, options);
-    // console.log('PubSubMQTTRepository subscribe', triggerName);
+    console.log('PubSubMQTTRepository subscribe', triggerName);
 
     const id = this.currentSubscriptionId++;
     this.subscriptions[id] = [triggerName, onMessage];

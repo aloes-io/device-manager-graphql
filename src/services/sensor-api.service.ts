@@ -28,7 +28,10 @@ export interface SensorApi {
     filter?: Filter<Measurement>,
   ): Promise<Measurement[]>;
 
-  findResources(token: string, sensorId: string): Promise<SensorResource>;
+  findResources(
+    token: string,
+    sensorId: string,
+  ): Promise<SensorResource | null>;
 
   updateResources(
     token: string,

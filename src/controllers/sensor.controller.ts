@@ -50,6 +50,8 @@ export class SensorController {
   async find(
     @param.query.object('filter', getFilterSchemaFor(Sensor))
     filter?: Filter<Sensor>,
+    @param.query.object('measurementFilter', getFilterSchemaFor(Measurement))
+    measurementFilter?: Filter<Measurement>,
   ): Promise<Sensor[]> {
     const token = getToken(this.request);
     return this.sensorApi.find(token, filter);
@@ -113,7 +115,7 @@ export class SensorController {
     return this.sensorApi.count(token, where);
   }
 
-  @cache(20)
+  @cache(10)
   @get(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'findSensorById',
     security,

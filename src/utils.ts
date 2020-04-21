@@ -74,13 +74,23 @@ export const sensorLinks = {
       filter: '$request.query.measurementFilter',
     },
   },
+  resources: {
+    operationId: 'findSensorResources',
+    parameters: {
+      sensorId: '$response.body#/id',
+    },
+  },
 };
+
+// const wildCardSelector = {
+//   MQTT : '+',
+//   EE: '*',
+// }
 
 // todo find a way to automatically update last segment based on the pubsub type
 // wildcard -> MQTT : +, EventEmitter2 : *
 const sensorCallbackExpression = `{$request.body#/ownerId}/${sensorsApiEndPoint}/{$method}/*`;
 const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/*`;
-// const deviceCallbackExpression = `{$request.body#/ownerId}/${devicesApiEndPoint}/{$method}/{$request.body#/deviceId}`;
 
 export const deviceCallbacks = {
   [deviceCallbackExpression]: {
