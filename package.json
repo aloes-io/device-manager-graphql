@@ -67,7 +67,8 @@
     "loopback-connector-rest": "^3.6.0",
     "loopback-pubsub-component": "^0.2.1",
     "mqtt": "^3.0.0",
-    "openapi-to-graphql": "^2.0.0",
+    "oma-json": "^1.1.1",
+    "openapi-to-graphql": "^2.1.0",
     "subscriptions-transport-ws": "^0.9.16"
   },
   "devDependencies": {
