@@ -1,8 +1,15 @@
-import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
+import {
+  belongsTo,
+  Entity,
+  hasMany,
+  model,
+  property,
+  embedsOne,
+} from '@loopback/repository';
 import {Device} from './device.model';
 import {Measurement} from './measurement.model';
 import {User} from './user.model';
-// import {SensorResource} from './sensorResource.model';
+import {SensorResource, SensorResources} from './sensorResource.model';
 
 @model({settings: {}})
 export class Sensor extends Entity {
@@ -143,8 +150,8 @@ export class Sensor extends Entity {
   @hasMany(() => Measurement)
   measurements?: Measurement[];
 
-  // @hasOne(() => SensorResource)
-  // resources?: SensorResource;
+  @embedsOne(() => SensorResource)
+  resources?: SensorResources;
 
   constructor(data?: Partial<Sensor>) {
     super(data);

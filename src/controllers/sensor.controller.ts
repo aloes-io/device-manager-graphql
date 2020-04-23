@@ -16,7 +16,7 @@ import {
 } from '@loopback/rest';
 import {cache} from 'loopback-api-component';
 import {callback} from 'loopback-callback-component';
-import {Measurement, SensorResource, Sensor} from '../models';
+import {Measurement, SensorResource, SensorResources, Sensor} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
 import {defaultResponse, getToken, sensorLinks, security} from '../utils';
 
@@ -307,7 +307,7 @@ export class SensorController {
   })
   async findResources(
     @param.path.string('sensorId') sensorId: string,
-  ): Promise<SensorResource | null> {
+  ): Promise<SensorResources | null> {
     const token = getToken(this.request);
     return this.sensorApi.findResources(token, sensorId);
   }

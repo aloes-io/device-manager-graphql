@@ -1,8 +1,73 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {ValueObject, model, property} from '@loopback/repository';
+import {
+  OMAResources,
+  Accelerometer,
+  Acidity,
+  Actuation,
+  AddressableTextDisplay,
+  Altitude,
+  AnalogInput,
+  AnalogOutput,
+  AudioClip,
+  Barometer,
+  Bitmap,
+  Buzzer,
+  CellBlacklistEvent,
+  CellReselectionEvent,
+  Color,
+  Concentration,
+  Conductivity,
+  Current,
+  Depth,
+  DigitalInput,
+  DigitalOutput,
+  Direction,
+  Distance,
+  Energy,
+  Frequency,
+  GenericSensor,
+  GpsLocation,
+  Gyrometer,
+  HandoverEvent,
+  HumiditySensor,
+  IlluminanceSensor,
+  LightControl,
+  Load,
+  LevelControl,
+  LoadControl,
+  Loudness,
+  Magnetometer,
+  MultipleAxisJoystick,
+  MultistateSelector,
+  OnOffSwitch,
+  Percentage,
+  PlmnSearchEvent,
+  Positioner,
+  Power,
+  PowerControl,
+  PowerFactor,
+  PowerMeasurment,
+  PowerupLog,
+  PresenceSensor,
+  Pressure,
+  PushButton,
+  RadioLinkFailureEvent,
+  Rate,
+  RrcStateChangeEvent,
+  RrcTimerExpiryEvent,
+  ScellId,
+  SetPoint,
+  Stopwatch,
+  TemperatureSensor,
+  Time,
+  Timer,
+  UpDownControl,
+  Voltage,
+} from 'oma-json';
 
 @model()
-export class SensorResource extends ValueObject {
+export class SensorResource extends ValueObject implements OMAResources {
   /**
    * The tool version that the device supports - used to determine the logging object/resource version to be used for parsing
    */
@@ -57,7 +122,7 @@ export class SensorResource extends ValueObject {
    * Reset the Counter value.
    */
   @property()
-  '5505'?: null;
+  '5505'?: string;
   /**
    * Unix Time. A signed integer representing the number of seconds since Jan 1st, 1970 in the UTC time zone.
    */
@@ -142,12 +207,12 @@ export class SensorResource extends ValueObject {
    * Audio Clip that is playable (i.e. short audio recording indicating the floor in an elevator).
    */
   @property()
-  '5522'?: any;
+  '5522'?: Buffer | any;
   /**
    * Trigger initiating actuation.
    */
   @property()
-  '5523'?: null;
+  '5523'?: string;
   /**
    * The duration of the sound once trigger.
    */
@@ -182,7 +247,7 @@ export class SensorResource extends ValueObject {
    * Command to clear the display.
    */
   @property()
-  '5530'?: null;
+  '5530'?: string;
   /**
    * Proportional control, integer value between 0 and 100 as a percentage.
    */
@@ -297,7 +362,7 @@ export class SensorResource extends ValueObject {
    * Reset the Min and Max Measured Values to Current Value.
    */
   @property()
-  '5605'?: null;
+  '5605'?: string;
   /**
    * The current state of the analogue output.
    */
@@ -342,7 +407,7 @@ export class SensorResource extends ValueObject {
    * The application type of the sensor or actuator as a string, for instance, “Air Pressure”.
    */
   @property()
-  '5750'?: any;
+  '5750'?: string | any;
   /**
    * The type of the sensor (for instance PIR type).
    */
@@ -432,7 +497,7 @@ export class SensorResource extends ValueObject {
    * Reset both cumulative active/reactive power.
    */
   @property()
-  '5822'?: null;
+  '5822'?: string;
   /**
    * The event identifier as a string.
    */
@@ -508,11 +573,12 @@ export class SensorResource extends ValueObject {
    */
   @property()
   '5910'?: number;
+  // '5910'?: Buffer | number;
   /**
    * Reset the Bitmap Input value.
    */
   @property()
-  '5911'?: null;
+  '5911'?: string;
   /**
    * The description of each bit as a string. First instance describes the least significant bit, second instance the second least significant bit.
    */
@@ -569,9 +635,74 @@ export class SensorResource extends ValueObject {
   @property()
   '6038'?: number;
 
-  // constructor(data?: Partial<SensorResource>) {
-  //   super(data);
-  // }
+  constructor(data?: Partial<SensorResource>) {
+    super(data);
+  }
 }
+
+export type SensorResources =
+  | Accelerometer
+  | Actuation
+  | Acidity
+  | Actuation
+  | AddressableTextDisplay
+  | Altitude
+  | AnalogInput
+  | AnalogOutput
+  | AudioClip
+  | Barometer
+  | Bitmap
+  | Buzzer
+  | CellBlacklistEvent
+  | CellReselectionEvent
+  | Color
+  | Concentration
+  | Conductivity
+  | Current
+  | Depth
+  | DigitalInput
+  | DigitalOutput
+  | Direction
+  | Distance
+  | Energy
+  | Frequency
+  | GenericSensor
+  | GpsLocation
+  | Gyrometer
+  | HandoverEvent
+  | HumiditySensor
+  | IlluminanceSensor
+  | LightControl
+  | Load
+  | LevelControl
+  | LoadControl
+  | Loudness
+  | Magnetometer
+  | MultipleAxisJoystick
+  | MultistateSelector
+  | OnOffSwitch
+  | Percentage
+  | PlmnSearchEvent
+  | Positioner
+  | Power
+  | PowerControl
+  | PowerFactor
+  | PowerMeasurment
+  | PowerupLog
+  | PresenceSensor
+  | Pressure
+  | PushButton
+  | RadioLinkFailureEvent
+  | Rate
+  | RrcStateChangeEvent
+  | RrcTimerExpiryEvent
+  | ScellId
+  | SetPoint
+  | Stopwatch
+  | TemperatureSensor
+  | Time
+  | Timer
+  | UpDownControl
+  | Voltage;
 
 /* eslint-enable @typescript-eslint/no-explicit-any */

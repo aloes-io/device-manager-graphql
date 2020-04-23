@@ -2,7 +2,7 @@ import {getService} from '@loopback/service-proxy';
 import {inject, Provider} from '@loopback/core';
 import {Count, Filter, Where} from '@loopback/repository';
 import {SensorDataSource} from '../datasources';
-import {Measurement, Sensor, SensorResource} from '../models';
+import {Measurement, Sensor, SensorResources} from '../models';
 
 export const sensorsApiBaseUrl = SensorDataSource.baseURL;
 export const sensorsApiEndPoint = SensorDataSource.endPoint;
@@ -31,13 +31,13 @@ export interface SensorApi {
   findResources(
     token: string,
     sensorId: string,
-  ): Promise<SensorResource | null>;
+  ): Promise<SensorResources | null>;
 
   updateResources(
     token: string,
     sensorId: string,
-    resources: SensorResource,
-  ): Promise<SensorResource>;
+    resources: SensorResources,
+  ): Promise<SensorResources>;
 
   deleteResources(token: string, sensorId: string): Promise<Boolean>;
 }
