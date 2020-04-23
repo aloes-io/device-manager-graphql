@@ -32,9 +32,7 @@ export class AloesBridge {
   }
 
   buildTopic(payload: Device | Sensor, endpoint: string, method: string) {
-    return `${payload.ownerId}/${endpoint}/${method.toUpperCase()}/${
-      payload.id
-    }`;
+    return `${payload.ownerId}/${endpoint}/${method.toUpperCase()}/${payload.id}`;
   }
 
   createSubscriptions(): Subscription[] {
@@ -66,9 +64,7 @@ export class AloesBridge {
       },
     }));
 
-    const subscriptions = [...sensorSubscriptions, ...deviceSubscriptions];
-
-    return subscriptions;
+    return [...sensorSubscriptions, ...deviceSubscriptions];
   }
 
   async start(): Promise<void> {
@@ -84,8 +80,8 @@ export class AloesBridge {
   }
 
   async stop(): Promise<void> {
-    const promises = this.subscriptions.map(async sub =>
-      this.pubsubMQTTRepo.unsubscribe(sub.topic),
+    const promises = this.subscriptions.map(async ({topic}) =>
+      this.pubsubMQTTRepo.unsubscribe(topic),
     );
     await Promise.all(promises);
     console.log('Stop Aloes bridge', 'done');

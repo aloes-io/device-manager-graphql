@@ -148,7 +148,7 @@ export class GraphQlBridge {
           };
 
           const body = {client, username, password};
-          console.log('GRAPHQL WS onConnect', body);
+          console.log('GRAPHQL WS onConnect');
           const {status} = await authentificationRequest(body);
           if (status !== 0) {
             throw new Error('Invalid credentials');
