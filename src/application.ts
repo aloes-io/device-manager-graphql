@@ -10,7 +10,7 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import {CacheBindings, CacheComponent} from 'loopback-api-component';
 import {CallbackBindings, CallbackComponent} from 'loopback-callback-component';
 import {PubSubBindings, PubSubComponent} from 'loopback-pubsub-component';
-import {EventEmitter2} from 'eventEmitter2';
+import {EventEmitter2} from 'eventemitter2';
 import {connect} from 'mqtt';
 import path from 'path';
 import merge from 'lodash.merge';

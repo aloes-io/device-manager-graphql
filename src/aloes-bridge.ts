@@ -32,7 +32,9 @@ export class AloesBridge {
   }
 
   buildTopic(payload: Device | Sensor, endpoint: string, method: string) {
-    return `${payload.ownerId}/${endpoint}/${method.toUpperCase()}/${payload.id}`;
+    return `${payload.ownerId}/${endpoint}/${method.toUpperCase()}/${
+      payload.id
+    }`;
   }
 
   createSubscriptions(): Subscription[] {

@@ -8,7 +8,7 @@ import {
   PubSubAsyncIterator,
 } from 'loopback-pubsub-component';
 import {EventEmitter} from 'events';
-import {EventEmitter2} from 'eventEmitter2';
+import {EventEmitter2} from 'eventemitter2';
 
 export class PubSubEERepository extends PubSubEngine {
   protected ee: EventEmitter | EventEmitter2;

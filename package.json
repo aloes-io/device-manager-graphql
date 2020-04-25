@@ -8,11 +8,12 @@
   ],
   "main": "index.js",
   "engines": {
-    "node": ">=8.9"
+    "node": ">=10.0"
   },
   "scripts": {
     "build": "npm run clean && lb-tsc",
     "build:watch": "lb-tsc --watch",
+    "build:docker": "docker build -t getlarge/aloes-graphql-api:latest .",
     "clean": "lb-clean dist *.tsbuildinfo",
     "lint": "npm run prettier:check && npm run eslint",
     "lint:fix": "npm run eslint:fix && npm run prettier:fix",
@@ -25,11 +26,12 @@
     "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
-    "docker:build": "docker build -t device-manager-graphql .",
-    "docker:run": "docker run -p 3000:3000 -d device-manager-graphql",
     "migrate": "node ./dist/migrate",
     "prestart": "npm run build",
     "start": "node -r source-map-support/register .",
+    "start:docker": "docker run -p 3000:3000 -d getlarge/aloes-graphql-api",
+    "stop:docker": "docker stop getlarge/aloes-graphql-api",
+    "publish:docker": "docker push getlarge/aloes-graphql-api:latest",
     "prepublishOnly": "npm run test"
   },
   "repository": {

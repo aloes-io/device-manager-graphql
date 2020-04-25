@@ -9,9 +9,6 @@ RUN mkdir -p /home/node/app
 
 WORKDIR /home/node/app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY --chown=node package*.json ./
 
 RUN npm install
@@ -22,7 +19,8 @@ COPY --chown=node . .
 RUN npm run build
 
 # Bind to all network interfaces so that it can be mapped to the host OS
-# ENV HOST=0.0.0.0 PORT=3000
+ENV WS_SERVER_HOST=0.0.0.0 WS_SERVER_PORT=3000
 
-# EXPOSE ${PORT}
+EXPOSE ${WS_SERVER_PORT}
+
 CMD [ "node", "." ]
