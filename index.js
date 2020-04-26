@@ -1,18 +1,12 @@
-const dotenv = require('dotenv');
 const application = require('./dist');
 
-const result = dotenv.config();
-if (result.error) {
-  throw result.error;
-}
-
-module.exports = application;
+require('dotenv').config();
 
 if (require.main === module) {
   const config = {
     rest: {
-      port: +(result.parsed.HTTP_SERVER_PORT || 3001),
-      host: result.parsed.HTTP_SERVER_HOST || 'localhost',
+      port: +(process.env.HTTP_SERVER_PORT ?? 3001),
+      host: process.env.HTTP_SERVER_HOST ?? 'localhost',
       gracePeriodForClose: 5000,
       expressSettings: {
         'x-powered-by': false,
@@ -23,7 +17,6 @@ if (require.main === module) {
         setServersFromRequest: true,
         //   endpointMapping: {
         //     '/openapi.json': { version: '3.0.0', format: 'json' },
-        //     '/openapi.yaml': { version: '3.0.0', format: 'yaml' },
         //   },
       },
       schemaPath: `${__dirname}/openapi.json`,
@@ -47,11 +40,12 @@ if (require.main === module) {
       },
     },
     ws: {
-      port: +(result.parsed.WS_SERVER_PORT || 3002),
-      host: result.parsed.WS_SERVER_HOST || 'localhost',
+      port: +(process.env.WS_SERVER_PORT ?? 3002),
+      host: process.env.WS_SERVER_HOST ?? 'localhost',
     },
     graphql: {
-      path: result.parsed.GRAPHQL_PATH || '/graphql',
+      httpPath: process.env.GRAPHQL_HTTP_PATH ?? '/graphql',
+      wsPath: process.env.GRAPHQL_WS_PATH ?? '/graphql',
       strict: false,
       viewer: true,
       fillEmptyResponses: true,
@@ -60,22 +54,19 @@ if (require.main === module) {
         'X-Origin': 'GraphQL',
       },
       schemaPath: `${__dirname}/openapi.graphql`,
-      graphiql: result.parsed.NODE_ENV !== 'production',
+      graphiql: process.env.NODE_ENV !== 'production',
     },
     mqtt: {
-      url: `${result.parsed.ALOES_BROKER_URL || 'ws://localhost:3000'}`,
-      subPrefix: `aloes-${result.parsed.ALOES_ID || 0}/+/tx/+`,
+      url: `${process.env.ALOES_BROKER_URL ?? 'ws://localhost:3000'}`,
+      subPrefix: `aloes-${process.env.ALOES_ID ?? 0}/+/tx/+`,
       options: {
         keepalive: 60,
-        // reschedulePings: true,
-        // protocolId: 'MQTT',
-        // protocolVersion: 4,
-        reconnectPeriod: 1000,
+        reconnectPeriod: 2000,
         connectTimeout: 2 * 1000,
         clean: true,
-        clientId: `aloes-${result.parsed.ALOES_ID || 0}-graphql`,
-        username: result.parsed.ALOES_ID || '',
-        password: result.parsed.ALOES_KEY || '',
+        clientId: `aloes-${process.env.ALOES_ID ?? 0}-graphql`,
+        username: process.env.ALOES_ID ?? '',
+        password: process.env.ALOES_KEY ?? '',
       },
     },
   };
@@ -87,3 +78,5 @@ if (require.main === module) {
     process.exit(1);
   });
 }
+
+module.exports = application;

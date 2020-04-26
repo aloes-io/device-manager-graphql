@@ -27,5 +27,5 @@ export async function main(options: ApplicationConfig = {}) {
   );
   await app.aloesBridge.start();
 
-  // return app;
+  return app;
 }

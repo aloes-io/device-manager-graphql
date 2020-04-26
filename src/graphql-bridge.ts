@@ -16,7 +16,8 @@ import {removeFile, writeFile} from './utils';
 type GraphQLBridgeOptions = {
   openAPISchemaPath: string;
   graphQLSchemaPath: string;
-  endpoint: string;
+  httpEndpoint: string;
+  wsEndpoint: string;
   headers?: {[key: string]: string};
   graphiql: boolean;
 };
@@ -37,10 +38,7 @@ const authentificationRequest = async (body: WSCredentials) => {
       'aloes-key': process.env.ALOES_KEY,
     },
   });
-  if (data) {
-    return data;
-  }
-  return null;
+  return data || null;
 };
 
 export class GraphQlBridge {
@@ -59,7 +57,8 @@ export class GraphQlBridge {
     this.bridgeOptions = {
       openAPISchemaPath: options.rest.schemaPath,
       graphQLSchemaPath: options.graphql.schemaPath,
-      endpoint: options.graphql.path,
+      httpEndpoint: options.graphql.httpPath,
+      wsEndpoint: options.graphql.wsPath,
       graphiql: options.graphql.graphiql,
     };
 
@@ -125,7 +124,7 @@ export class GraphQlBridge {
     //     // return req.headers.authorization.replace(/^Bearer /, '');
     //   }
     // }
-    this.app.mountExpressRouter(this.bridgeOptions.endpoint, handler);
+    this.app.mountExpressRouter(this.bridgeOptions.httpEndpoint, handler);
 
     this.subscriptionServer = new SubscriptionServer(
       {
@@ -155,10 +154,6 @@ export class GraphQlBridge {
           }
           return {pubsub: this.pubsub};
         },
-        // onOperation: (message: any, params: any, webSocket: WebSocket) => {
-        //   console.log('GRAPHQL WS onOperation', {message});
-        //   return {};
-        // },
         onDisconnect: (socket: WebSocket, ctx: any) => {
           // delete created client with params, if any
           console.log('GRAPHQL WS onDisconnect');
@@ -166,7 +161,7 @@ export class GraphQlBridge {
       },
       {
         server: this.httpServer,
-        path: this.bridgeOptions.endpoint,
+        path: this.bridgeOptions.wsEndpoint,
       },
     );
   }
