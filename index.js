@@ -77,7 +77,7 @@ if (require.main === module) {
       }/+/tx/+`,
       options: {
         keepalive: 60,
-        reconnectPeriod: 2000,
+        reconnectPeriod: 1000,
         connectTimeout: 2 * 1000,
         clean: true,
         clientId: `aloes-${
