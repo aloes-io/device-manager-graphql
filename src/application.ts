@@ -1,9 +1,6 @@
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-import {
-  RestExplorerBindings,
-  RestExplorerComponent,
-} from '@loopback/rest-explorer';
+import {RestExplorerBindings, RestExplorerComponent} from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication, RestBindings} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
@@ -14,17 +11,19 @@ import {EventEmitter2} from 'eventemitter2';
 import {connect} from 'mqtt';
 import path from 'path';
 import merge from 'lodash.merge';
-import {
-  CacheStrategyProvider,
-  CallbackStrategyProvider,
-  PubSubStrategyProvider,
-} from './providers';
+import {AloesBridge} from './aloes-bridge';
+import {GraphQlBridge} from './graphql-bridge';
+import {CacheStrategyProvider, CallbackStrategyProvider, PubSubStrategyProvider} from './providers';
 import {MySequence} from './sequence';
 import {deviceCallbacks, sensorCallbacks} from './utils';
 
 export class DeviceManagerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
+  public graphQlBridge: GraphQlBridge;
+
+  public aloesBridge: AloesBridge;
+
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
@@ -44,14 +43,10 @@ export class DeviceManagerApplication extends BootMixin(
       client: mqttClient,
     });
     this.component(PubSubComponent);
-    this.bind(PubSubBindings.PUBSUB_STRATEGY).toProvider(
-      PubSubStrategyProvider,
-    );
+    this.bind(PubSubBindings.PUBSUB_STRATEGY).toProvider(PubSubStrategyProvider);
 
     this.component(CallbackComponent);
-    this.bind(CallbackBindings.CALLBACK_STRATEGY).toProvider(
-      CallbackStrategyProvider,
-    );
+    this.bind(CallbackBindings.CALLBACK_STRATEGY).toProvider(CallbackStrategyProvider);
 
     this.component(CacheComponent);
     this.bind(CacheBindings.CACHE_STRATEGY).toProvider(CacheStrategyProvider);

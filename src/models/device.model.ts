@@ -1,10 +1,4 @@
-import {
-  belongsTo,
-  Entity,
-  hasMany,
-  model,
-  property,
-} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {User} from './user.model';
 import {Sensor} from './sensor.model';
 
@@ -88,6 +82,13 @@ export class Device extends Entity {
     required: false,
   })
   messageProtocolVersion?: string;
+
+  @property({
+    type: 'array',
+    required: true,
+    itemType: 'string',
+  })
+  icons: string[];
 
   @property({
     type: 'string',
