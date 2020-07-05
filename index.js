@@ -82,7 +82,7 @@ if (require.main === module) {
         clean: true,
         clientId: `aloes-${
           process.env.ALOES_ID ? process.env.ALOES_ID : 0
-        }-graphql`,
+        }-graphql${process.env.SUFFIX_ID ? `-${process.env.SUFFIX_ID}` : ''}`,
         username: process.env.ALOES_ID ? process.env.ALOES_ID : '',
         password: process.env.ALOES_KEY ? process.env.ALOES_KEY : '',
       },
