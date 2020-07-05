@@ -141,9 +141,7 @@ export class GraphQlBridge {
           // console.log(socket._socket.remoteAddress, ctx.request.connection.remoteAddress);
           const client = {
             ip: socket._socket.remoteAddress,
-            id: `${username}-${Math.random()
-              .toString(16)
-              .substr(2, 8)}`,
+            id: `${username}-${Math.random().toString(16).substr(2, 8)}`,
           };
 
           const body = {client, username, password};

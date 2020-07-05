@@ -94,7 +94,8 @@ export class PubSubMQTTRepository extends PubSubEngine {
     this.subIdCounter = 0;
     this.currentSubscriptionId = 0;
 
-    this.triggerTransform = options.triggerTransform ?? ((trigger) => trigger as string);
+    this.triggerTransform =
+      options.triggerTransform ?? (trigger => trigger as string);
 
     if (options.client) {
       this.client = options.client;
@@ -114,19 +115,23 @@ export class PubSubMQTTRepository extends PubSubEngine {
 
     this.onMQTTSubscribe = options.onMQTTSubscribe ?? (() => null);
     this.publishOptionsResolver =
-      options.publishOptions ?? (() => Promise.resolve({} as IClientPublishOptions));
+      options.publishOptions ??
+      (() => Promise.resolve({} as IClientPublishOptions));
     this.subscribeOptionsResolver =
-      options.subscribeOptions ?? (() => Promise.resolve({} as IClientSubscribeOptions));
+      options.subscribeOptions ??
+      (() => Promise.resolve({} as IClientSubscribeOptions));
     this.parseMessageWithEncoding = options.parseMessageWithEncoding;
   }
 
   public publish(triggerName: string, payload: any): Promise<void> {
-    return this.publishOptionsResolver(triggerName, payload).then((publishOptions) => {
-      payload = JSON.stringify(payload);
-      const message = Buffer.from(payload, this.parseMessageWithEncoding);
-      console.log('PubSubMQTTRepository publish', triggerName);
-      this.client.publish(triggerName, message, publishOptions);
-    });
+    return this.publishOptionsResolver(triggerName, payload).then(
+      publishOptions => {
+        payload = JSON.stringify(payload);
+        const message = Buffer.from(payload, this.parseMessageWithEncoding);
+        console.log('PubSubMQTTRepository publish', triggerName);
+        this.client.publish(triggerName, message, publishOptions);
+      },
+    );
     // return true;
   }
 
@@ -149,20 +154,24 @@ export class PubSubMQTTRepository extends PubSubEngine {
     }
     return new Promise<number>((resolve, reject) => {
       this.subscribeOptionsResolver(trigger, options)
-        .then((subscriptionOptions) => {
-          this.client.subscribe(triggerName, {...subscriptionOptions}, (err, granted) => {
-            if (err) {
-              reject(err);
-            } else {
-              const subscriptionIds = this.subsRefsMap[triggerName] || [];
-              this.subsRefsMap[triggerName] = [...subscriptionIds, id];
-              resolve(id);
+        .then(subscriptionOptions => {
+          this.client.subscribe(
+            triggerName,
+            {...subscriptionOptions},
+            (err, granted) => {
+              if (err) {
+                reject(err);
+              } else {
+                const subscriptionIds = this.subsRefsMap[triggerName] || [];
+                this.subsRefsMap[triggerName] = [...subscriptionIds, id];
+                resolve(id);
 
-              this.onMQTTSubscribe(id, granted);
-            }
-          });
+                this.onMQTTSubscribe(id, granted);
+              }
+            },
+          );
         })
-        .catch((err) => reject(err));
+        .catch(err => reject(err));
     });
   }
 
@@ -178,11 +187,11 @@ export class PubSubMQTTRepository extends PubSubEngine {
   }
 
   private onMessage(topic: string, message: Buffer) {
-    const subsRefsKeys = Object.keys(this.subsRefsMap).filter((key) =>
+    const subsRefsKeys = Object.keys(this.subsRefsMap).filter(key =>
       PubSubMQTTRepository.matches(key, topic),
     );
     let subscribers: number[] = [];
-    subsRefsKeys.forEach((refKey) => {
+    subsRefsKeys.forEach(refKey => {
       subscribers = [...subscribers, ...this.subsRefsMap[refKey]];
     });
 
@@ -260,7 +269,10 @@ export class PubSubMQTTRepository extends PubSubEngine {
 
 export type Path = Array<string | number>;
 export type Trigger = string | Path;
-export type TriggerTransform = (trigger: Trigger, channelOptions?: Object) => string;
+export type TriggerTransform = (
+  trigger: Trigger,
+  channelOptions?: Object,
+) => string;
 
 export type SubscribeOptionsResolver = (
   trigger: Trigger,
@@ -272,7 +284,10 @@ export type PublishOptionsResolver = (
   payload: any,
 ) => Promise<IClientPublishOptions>;
 
-export type SubscribeHandler = (id: number, granted: ISubscriptionGrant[]) => void;
+export type SubscribeHandler = (
+  id: number,
+  granted: ISubscriptionGrant[],
+) => void;
 
 /* eslint-enable @typescript-eslint/no-explicit-any */
 /* eslint-enable security/detect-object-injection */

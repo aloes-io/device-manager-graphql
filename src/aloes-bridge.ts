@@ -38,13 +38,10 @@ export class AloesBridge {
   }
 
   createSubscriptions(): Subscription[] {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-
-    function bridge(packet: Packet) {
+    const bridge = (packet: Packet) => {
       const {topic, payload} = packet;
-      self.pubsubEERepo.publish(topic, payload).catch(e => e);
-    }
+      this.pubsubEERepo.publish(topic, payload).catch(e => e);
+    };
 
     const sensorSubscriptions = this.methods.map(method => ({
       topic: `${this.endPoint}/Sensor/${method}/#`,

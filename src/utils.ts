@@ -155,11 +155,8 @@ export const sensorCallbacks = {
   },
 };
 
-// export const getToken = (req: Request): string => {
 export const getToken = (req: any): string => {
-  return req.headers && req.headers.authorization
-    ? req.headers.authorization
-    : '';
+  return req.headers?.authorization || '';
 };
 
 export const readFile = (filePath: string, opts = 'utf8') =>
