@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {inject} from '@loopback/context';
-import {getModelSchemaRef} from '@loopback/openapi-v3';
 import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
   // api,
+  patch,
   post,
   param,
   get,
@@ -154,6 +153,37 @@ export class DeviceController {
     return this.deviceApi.findById(token, deviceId);
   }
 
+  @patch(`/${devicesApiEndPoint}/{deviceId}`, {
+    operationId: 'updateDeviceById',
+    security,
+    responses: {
+      '200': {
+        description: 'Device instance',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': Device,
+            },
+          },
+        },
+        links: deviceLinks,
+      },
+      default: defaultResponse,
+    },
+    callbacks: {
+      deviceChange: {
+        $ref: '#/components/callbacks/DeviceEvents',
+      },
+    },
+  })
+  async updateById(
+    @param.path.string('deviceId') deviceId: string,
+    @requestBody() device: Device | Partial<Device>,
+  ): Promise<Device> {
+    const token = getToken(this.request);
+    return this.deviceApi.updateById(token, deviceId, device);
+  }
+
   @put(`/${devicesApiEndPoint}/{deviceId}`, {
     operationId: 'replaceDeviceById',
     security,
@@ -223,7 +253,7 @@ export class DeviceController {
     return this.deviceApi.deleteById(token, deviceId);
   }
 
-  @cache(10)
+  @cache(30)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors`, {
     operationId: 'findDeviceSensors',
     security,
@@ -256,7 +286,7 @@ export class DeviceController {
     return this.deviceApi.findSensors(token, deviceId, filter);
   }
 
-  @cache(10)
+  @cache(30)
   @get(`/${devicesApiEndPoint}/{deviceId}/sensors/count`, {
     operationId: 'findDeviceSensorsCount',
     security,
@@ -296,4 +326,3 @@ export class DeviceController {
     return this.deviceApi.authenticate(credentials);
   }
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */

@@ -16,9 +16,13 @@ export interface SensorApi {
 
   create(token: string, sensor: Sensor): Promise<Sensor>;
 
-  replaceById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
+  updateById(
+    token: string,
+    sensorId: string,
+    sensor: Sensor | Partial<Sensor>,
+  ): Promise<Sensor>;
 
-  updateById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
+  replaceById(token: string, sensorId: string, sensor: Sensor): Promise<Sensor>;
 
   deleteById(token: string, sensorId: string): Promise<{id: string}>;
 

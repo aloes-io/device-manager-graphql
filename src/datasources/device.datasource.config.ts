@@ -75,6 +75,19 @@ const deviceDefintion = {
     },
     {
       template: {
+        method: 'PATCH',
+        url: `${baseURL}/${endPoint}/{deviceId}`,
+        headers: {
+          authorization: '{token}',
+        },
+        body: '{device}',
+      },
+      functions: {
+        updateById: ['token', 'deviceId', 'device'],
+      },
+    },
+    {
+      template: {
         method: 'PUT',
         url: `${baseURL}/${endPoint}/{deviceId}`,
         headers: {

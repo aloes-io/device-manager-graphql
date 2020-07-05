@@ -28,6 +28,12 @@ export interface DeviceApi {
 
   create(token: string, device: Device): Promise<Device>;
 
+  updateById(
+    token: string,
+    deviceId: string,
+    device: Device | Partial<Device>,
+  ): Promise<Device>;
+
   replaceById(token: string, deviceId: string, device: Device): Promise<Device>;
 
   deleteById(token: string, deviceId: string): Promise<{id: string}>;
