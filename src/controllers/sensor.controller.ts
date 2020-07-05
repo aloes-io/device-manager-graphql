@@ -1,4 +1,3 @@
-// import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/context';
 import {Count, CountSchema, Filter, Where} from '@loopback/repository';
 import {
@@ -16,7 +15,70 @@ import {
 } from '@loopback/rest';
 import {cache} from 'loopback-api-component';
 import {callback} from 'loopback-callback-component';
-import {Measurement, SensorResource, SensorResources, Sensor} from '../models';
+import {
+  Measurement,
+  SensorResources,
+  Sensor,
+  Accelerometer,
+  Acidity,
+  Actuation,
+  AddressableTextDisplay,
+  Altitude,
+  AnalogOutput,
+  AnalogInput,
+  AudioClip,
+  Barometer,
+  Bitmap,
+  Buzzer,
+  CellBlacklistEvent,
+  CellReselectionEvent,
+  Color,
+  Concentration,
+  Conductivity,
+  Current,
+  Depth,
+  DigitalInput,
+  DigitalOutput,
+  Direction,
+  Distance,
+  Energy,
+  Frequency,
+  GenericSensor,
+  GpsLocation,
+  Gyrometer,
+  HandoverEvent,
+  HumiditySensor,
+  IlluminanceSensor,
+  LevelControl,
+  LightControl,
+  LoadControl,
+  Load,
+  Loudness,
+  Magnetometer,
+  MultipleAxisJoystick,
+  MultistateSelector,
+  OnOffSwitch,
+  Percentage,
+  PlmnSearchEvent,
+  Positioner,
+  PowerControl,
+  PowerFactor,
+  PowerMeasurment,
+  Power,
+  PowerupLog,
+  PresenceSensor,
+  Pressure,
+  PushButton,
+  RadioLinkFailureEvent,
+  Rate,
+  SetPoint,
+  Stopwatch,
+  TemperatureSensor,
+  Time,
+  Timer,
+  UpDownControl,
+  Voltage,
+} from '../models';
 import {SensorApi, sensorsApiEndPoint} from '../services';
 import {defaultResponse, getToken, sensorLinks, security} from '../utils';
 
@@ -27,7 +89,7 @@ export class SensorController {
   ) {}
 
   // @authorize('jwt')
-  @cache(20)
+  @cache(30)
   @get(`/${sensorsApiEndPoint}`, {
     operationId: 'findSensors',
     security,
@@ -95,7 +157,7 @@ export class SensorController {
     return this.sensorApi.create(token, device);
   }
 
-  @cache(20)
+  @cache(30)
   @get(`/${sensorsApiEndPoint}/count`, {
     operationId: 'sensorsCount',
     security,
@@ -115,7 +177,7 @@ export class SensorController {
     return this.sensorApi.count(token, where);
   }
 
-  @cache(10)
+  @cache(30)
   @get(`/${sensorsApiEndPoint}/{sensorId}`, {
     operationId: 'findSensorById',
     security,
@@ -172,7 +234,7 @@ export class SensorController {
   })
   async updateById(
     @param.path.string('sensorId') sensorId: string,
-    @requestBody() sensor: Sensor,
+    @requestBody() sensor: Sensor | Partial<Sensor>,
   ): Promise<Sensor> {
     const token = getToken(this.request);
     return this.sensorApi.updateById(token, sensorId, sensor);
@@ -297,7 +359,67 @@ export class SensorController {
         content: {
           'application/json': {
             schema: {
-              'x-ts-type': SensorResource,
+              oneOf: [
+                {'x-ts-type': Accelerometer},
+                {'x-ts-type': Acidity},
+                {'x-ts-type': Actuation},
+                {'x-ts-type': AddressableTextDisplay},
+                {'x-ts-type': Altitude},
+                {'x-ts-type': AnalogInput},
+                {'x-ts-type': AnalogOutput},
+                {'x-ts-type': AudioClip},
+                {'x-ts-type': Barometer},
+                {'x-ts-type': Bitmap},
+                {'x-ts-type': Buzzer},
+                {'x-ts-type': CellBlacklistEvent},
+                {'x-ts-type': CellReselectionEvent},
+                {'x-ts-type': Color},
+                {'x-ts-type': Concentration},
+                {'x-ts-type': Conductivity},
+                {'x-ts-type': Current},
+                {'x-ts-type': Depth},
+                {'x-ts-type': DigitalInput},
+                {'x-ts-type': DigitalOutput},
+                {'x-ts-type': Direction},
+                {'x-ts-type': Distance},
+                {'x-ts-type': Energy},
+                {'x-ts-type': Frequency},
+                {'x-ts-type': GenericSensor},
+                {'x-ts-type': GpsLocation},
+                {'x-ts-type': Gyrometer},
+                {'x-ts-type': HandoverEvent},
+                {'x-ts-type': HumiditySensor},
+                {'x-ts-type': IlluminanceSensor},
+                {'x-ts-type': LevelControl},
+                {'x-ts-type': LightControl},
+                {'x-ts-type': LoadControl},
+                {'x-ts-type': Load},
+                {'x-ts-type': Loudness},
+                {'x-ts-type': Magnetometer},
+                {'x-ts-type': MultipleAxisJoystick},
+                {'x-ts-type': MultistateSelector},
+                {'x-ts-type': OnOffSwitch},
+                {'x-ts-type': Percentage},
+                {'x-ts-type': PlmnSearchEvent},
+                {'x-ts-type': Positioner},
+                {'x-ts-type': PowerControl},
+                {'x-ts-type': PowerFactor},
+                {'x-ts-type': PowerMeasurment},
+                {'x-ts-type': Power},
+                {'x-ts-type': PowerupLog},
+                {'x-ts-type': PresenceSensor},
+                {'x-ts-type': Pressure},
+                {'x-ts-type': PushButton},
+                {'x-ts-type': RadioLinkFailureEvent},
+                {'x-ts-type': Rate},
+                {'x-ts-type': SetPoint},
+                {'x-ts-type': Stopwatch},
+                {'x-ts-type': TemperatureSensor},
+                {'x-ts-type': Time},
+                {'x-ts-type': Timer},
+                {'x-ts-type': UpDownControl},
+                {'x-ts-type': Voltage},
+              ],
             },
           },
         },

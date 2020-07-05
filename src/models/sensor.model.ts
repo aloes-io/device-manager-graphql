@@ -7,9 +7,73 @@ import {
   embedsOne,
 } from '@loopback/repository';
 import {Device} from './device.model';
-import {Measurement} from './measurement.model';
 import {User} from './user.model';
-import {SensorResource, SensorResources} from './sensorResource.model';
+import {
+  Measurement,
+  SensorResources,
+  Accelerometer,
+  Acidity,
+  Actuation,
+  AddressableTextDisplay,
+  Altitude,
+  AnalogOutput,
+  AnalogInput,
+  AudioClip,
+  Barometer,
+  Bitmap,
+  Buzzer,
+  CellBlacklistEvent,
+  CellReselectionEvent,
+  Color,
+  Concentration,
+  Conductivity,
+  Current,
+  Depth,
+  DigitalInput,
+  DigitalOutput,
+  Direction,
+  Distance,
+  Energy,
+  Frequency,
+  GenericSensor,
+  GpsLocation,
+  Gyrometer,
+  HandoverEvent,
+  HumiditySensor,
+  IlluminanceSensor,
+  LevelControl,
+  LightControl,
+  LoadControl,
+  Load,
+  Loudness,
+  Magnetometer,
+  MultipleAxisJoystick,
+  MultistateSelector,
+  OnOffSwitch,
+  Percentage,
+  PlmnSearchEvent,
+  Positioner,
+  PowerControl,
+  PowerFactor,
+  PowerMeasurment,
+  Power,
+  PowerupLog,
+  PresenceSensor,
+  Pressure,
+  PushButton,
+  RadioLinkFailureEvent,
+  Rate,
+  RrcTimerExpiryEvent,
+  RrcStateChangeEvent,
+  ScellId,
+  SetPoint,
+  Stopwatch,
+  TemperatureSensor,
+  Time,
+  Timer,
+  UpDownControl,
+  Voltage,
+} from './';
 
 @model({settings: {}})
 export class Sensor extends Entity {
@@ -150,7 +214,72 @@ export class Sensor extends Entity {
   @hasMany(() => Measurement)
   measurements?: Measurement[];
 
-  @embedsOne(() => SensorResource)
+  @embedsOne(
+    () =>
+      Accelerometer ||
+      Actuation ||
+      Acidity ||
+      Actuation ||
+      AddressableTextDisplay ||
+      Altitude ||
+      AnalogInput ||
+      AnalogOutput ||
+      AudioClip ||
+      Barometer ||
+      Bitmap ||
+      Buzzer ||
+      CellBlacklistEvent ||
+      CellReselectionEvent ||
+      Color ||
+      Concentration ||
+      Conductivity ||
+      Current ||
+      Depth ||
+      DigitalInput ||
+      DigitalOutput ||
+      Direction ||
+      Distance ||
+      Energy ||
+      Frequency ||
+      GenericSensor ||
+      GpsLocation ||
+      Gyrometer ||
+      HandoverEvent ||
+      HumiditySensor ||
+      IlluminanceSensor ||
+      LightControl ||
+      Load ||
+      LevelControl ||
+      LoadControl ||
+      Loudness ||
+      Magnetometer ||
+      MultipleAxisJoystick ||
+      MultistateSelector ||
+      OnOffSwitch ||
+      Percentage ||
+      PlmnSearchEvent ||
+      Positioner ||
+      Power ||
+      PowerControl ||
+      PowerFactor ||
+      PowerMeasurment ||
+      PowerupLog ||
+      PresenceSensor ||
+      Pressure ||
+      PushButton ||
+      RadioLinkFailureEvent ||
+      Rate ||
+      RrcStateChangeEvent ||
+      RrcTimerExpiryEvent ||
+      ScellId ||
+      SetPoint ||
+      Stopwatch ||
+      TemperatureSensor ||
+      Time ||
+      Timer ||
+      UpDownControl ||
+      Voltage,
+  )
   resources?: SensorResources;
 
   constructor(data?: Partial<Sensor>) {
