@@ -35,7 +35,8 @@ export class Direction {
    * The compass direction.
    */
   @property()
-  '5705'?: number | any;
+  '5705'?: any;
+  // '5705'?: number ;
 
   /**
    * The application type of the sensor or actuator as a string, for instance, “Air Pressure”.

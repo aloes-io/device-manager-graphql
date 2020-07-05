@@ -23,7 +23,8 @@ export class Bitmap {
    * Integer in which each of the bits are associated with specific digital input value. Represented as a binary signed integer in network byte order, and in two's complement representation. Using values in range 0-127 is recommended to avoid ambiguities with byte order and negative values.
    */
   @property()
-  '5910'?: number | any;
+  '5910'?: any;
+  // '5910'?: number ;
 
   /**
    * Reset the Bitmap Input value.

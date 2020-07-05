@@ -207,7 +207,7 @@ export class SensorResource extends ValueObject implements OMAResources {
    * Audio Clip that is playable (i.e. short audio recording indicating the floor in an elevator).
    */
   @property()
-  '5522'?: Buffer | any;
+  '5522'?: any;
   /**
    * Trigger initiating actuation.
    */
@@ -397,7 +397,8 @@ export class SensorResource extends ValueObject implements OMAResources {
    * The compass direction.
    */
   @property()
-  '5705'?: number;
+  '5705'?: any;
+  // '5705'?: number;
   /**
    * A string representing a value in some color space
    */
@@ -572,8 +573,8 @@ export class SensorResource extends ValueObject implements OMAResources {
    * Integer in which each of the bits are associated with specific digital input value. Represented as a binary signed integer in network byte order, and in two's complement representation. Using values in range 0-127 is recommended to avoid ambiguities with byte order and negative values.
    */
   @property()
-  '5910'?: number;
-  // '5910'?: Buffer | number;
+  '5910'?: any;
+  // '5910'?: number;
   /**
    * Reset the Bitmap Input value.
    */
