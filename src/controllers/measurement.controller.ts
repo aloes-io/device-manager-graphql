@@ -24,7 +24,7 @@ export class MeasurementController {
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
-  @cache(10)
+  @cache(20)
   @get(`/${measurementsApiEndPoint}`, {
     operationId: 'findMeasurements',
     security,

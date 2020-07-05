@@ -38,6 +38,7 @@ export class UserController {
     @inject(RestBindings.Http.REQUEST) public request: Request,
   ) {}
 
+  @cache(60)
   @get(`/${usersApiEndPoint}`, {
     operationId: 'findUsers',
     security,
@@ -80,6 +81,7 @@ export class UserController {
     return this.userApi.create(token, user);
   }
 
+  @cache(60)
   @get(`/${usersApiEndPoint}/count`, {
     operationId: 'usersCount',
     security,
@@ -179,7 +181,7 @@ export class UserController {
     return this.userApi.findDevicesCount(token, userId, where);
   }
 
-  @cache(20)
+  @cache(30)
   @get(`/${usersApiEndPoint}/{userId}/sensors`, {
     operationId: 'findUserSensors',
     security,
@@ -208,7 +210,7 @@ export class UserController {
     return this.userApi.findSensors(token, userId, filter);
   }
 
-  @cache(20)
+  @cache(30)
   @get(`/${usersApiEndPoint}/{userId}/sensors/count`, {
     operationId: 'findUserSensorsCount',
     security,
