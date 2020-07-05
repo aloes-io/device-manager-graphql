@@ -397,8 +397,7 @@ export class SensorResource extends ValueObject implements OMAResources {
    * The compass direction.
    */
   @property()
-  '5705'?: any;
-  // '5705'?: number;
+  '5705'?: number;
   /**
    * A string representing a value in some color space
    */

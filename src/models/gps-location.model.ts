@@ -47,8 +47,7 @@ export class GpsLocation {
    * The compass direction.
    */
   @property()
-  '5705'?: any;
-  // '5705'?: number;
+  '5705'?: number;
 }
 
 export interface GpsLocationRelations {
